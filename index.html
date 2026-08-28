@@ -1,0 +1,366 @@
+<!doctype html>
+<html lang="bg">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Анонимна анкета сред хора с множествена склероза.">
+  <title>Анкета — Множествена склероза</title>
+  <link rel="icon" href="logo.png">
+  <style>
+    :root{
+      --navy:#102d54;
+      --orange:#f47b20;
+      --bg:#f5f7fa;
+      --card:#ffffff;
+      --text:#172235;
+      --muted:#667085;
+      --border:#d9dee7;
+      --focus:rgba(244,123,32,.18);
+      --success:#18794e;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:Arial, Helvetica, sans-serif;
+      background:linear-gradient(180deg,#fff 0,#f5f7fa 420px);
+      color:var(--text);
+      line-height:1.5;
+    }
+    .wrap{max-width:860px;margin:0 auto;padding:28px 18px 60px}
+    .hero{
+      background:var(--card);
+      border-radius:24px;
+      padding:28px 24px 24px;
+      box-shadow:0 12px 36px rgba(16,45,84,.10);
+      text-align:center;
+      border:1px solid #edf0f4;
+    }
+    .hero img{max-width:300px;width:72%;height:auto;display:block;margin:0 auto 10px}
+    .hero h1{margin:8px 0 4px;color:var(--navy);font-size:30px}
+    .hero p{margin:0;color:var(--muted)}
+    .notice{
+      margin:18px 0;
+      padding:14px 16px;
+      border-left:4px solid var(--orange);
+      background:#fff8f1;
+      border-radius:10px;
+      font-size:14px;
+    }
+    form{margin-top:18px}
+    .card{
+      background:var(--card);
+      border:1px solid #e7ebf0;
+      border-radius:18px;
+      padding:22px;
+      margin:14px 0;
+      box-shadow:0 5px 18px rgba(16,45,84,.05);
+    }
+    .q-title{
+      font-weight:700;
+      font-size:18px;
+      color:var(--navy);
+      margin:0 0 12px;
+    }
+    .help{font-size:13px;color:var(--muted);margin:-4px 0 12px}
+    .options{display:grid;gap:9px}
+    label.option{
+      display:flex;
+      align-items:flex-start;
+      gap:10px;
+      padding:11px 12px;
+      border:1px solid var(--border);
+      border-radius:10px;
+      cursor:pointer;
+      background:#fff;
+    }
+    label.option:hover{border-color:var(--orange)}
+    input[type=radio],input[type=checkbox]{margin-top:4px;accent-color:var(--orange)}
+    .subquestion{margin:15px 0 0;padding-left:14px;border-left:3px solid #eceff4}
+    .hidden{display:none}
+    textarea,input[type=text]{width:100%;padding:11px 12px;border:1px solid var(--border);border-radius:10px;font:inherit}
+    textarea:focus,input[type=text]:focus{outline:none;border-color:var(--orange);box-shadow:0 0 0 4px var(--focus)}
+    .actions{display:flex;align-items:center;gap:12px;margin-top:18px}
+    button{
+      border:0;border-radius:12px;padding:13px 18px;
+      background:var(--orange);color:white;font-weight:700;font-size:16px;cursor:pointer;
+    }
+    button:hover{filter:brightness(.96)}
+    button:disabled{opacity:.6;cursor:not-allowed}
+    .status{font-size:14px;color:var(--muted)}
+    .success{
+      display:none;margin-top:18px;padding:16px;background:#edf9f3;
+      border:1px solid #b9e5ce;color:var(--success);border-radius:12px;
+    }
+    .error{
+      display:none;margin-top:18px;padding:16px;background:#fff1f1;
+      border:1px solid #efc3c3;color:#9a2727;border-radius:12px;
+    }
+    .required{color:var(--orange)}
+    footer{text-align:center;color:var(--muted);font-size:12px;margin-top:20px}
+    @media (max-width:600px){
+      .wrap{padding:14px 10px 40px}
+      .hero{padding:20px 16px}
+      .hero h1{font-size:24px}
+      .card{padding:17px}
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <section class="hero">
+    <img src="logo.png" alt="Множествена склероза — Актуално">
+    <h1>Анкета сред хора с МС</h1>
+    <p>Попълването отнема приблизително 3–5 минути.</p>
+  </section>
+
+  <div class="notice">
+    <strong>Важно:</strong> Анкетата не изисква име, ЕГН, телефон или друг пряк идентификатор.
+    Не въвеждайте лични данни в свободните полета.
+  </div>
+
+  <form id="surveyForm" novalidate>
+    <div class="card">
+      <p class="q-title">1. От колко време сте диагностицирани с множествена склероза (МС)? <span class="required">*</span></p>
+      <div class="options">
+        <label class="option"><input type="radio" name="years_ms" value="Под 1 година" required><span>Под 1 година</span></label>
+        <label class="option"><input type="radio" name="years_ms" value="1–2 години"><span>1–2 години</span></label>
+        <label class="option"><input type="radio" name="years_ms" value="3–5 години"><span>3–5 години</span></label>
+        <label class="option"><input type="radio" name="years_ms" value="6–10 години"><span>6–10 години</span></label>
+        <label class="option"><input type="radio" name="years_ms" value="11–20 години"><span>11–20 години</span></label>
+        <label class="option"><input type="radio" name="years_ms" value="Над 20 години"><span>Над 20 години</span></label>
+      </div>
+    </div>
+
+    <div class="card">
+      <p class="q-title">2. На каква възраст сте? <span class="required">*</span></p>
+      <div class="options">
+        <label class="option"><input type="radio" name="age" value="Под 20 г." required><span>Под 20 г.</span></label>
+        <label class="option"><input type="radio" name="age" value="20–29 г."><span>20–29 г.</span></label>
+        <label class="option"><input type="radio" name="age" value="30–39 г."><span>30–39 г.</span></label>
+        <label class="option"><input type="radio" name="age" value="40–49 г."><span>40–49 г.</span></label>
+        <label class="option"><input type="radio" name="age" value="50–59 г."><span>50–59 г.</span></label>
+        <label class="option"><input type="radio" name="age" value="60+ г."><span>60+ г.</span></label>
+      </div>
+    </div>
+
+    <div class="card">
+      <p class="q-title">3. Пушите ли? <span class="required">*</span></p>
+      <div class="options">
+        <label class="option"><input type="radio" name="smoking" value="Да" required><span>Да</span></label>
+        <label class="option"><input type="radio" name="smoking" value="Не"><span>Не</span></label>
+      </div>
+    </div>
+
+    <div class="card">
+      <p class="q-title">4. Употребявате ли алкохол? <span class="required">*</span></p>
+      <div class="options">
+        <label class="option"><input type="radio" name="alcohol" value="Да" required><span>Да</span></label>
+        <label class="option"><input type="radio" name="alcohol" value="Не"><span>Не</span></label>
+      </div>
+    </div>
+
+    <div class="card">
+      <p class="q-title">5. Какъв беше Вашият EDSS при диагностицирането на МС?</p>
+      <div class="options">
+        <label class="option"><input type="radio" name="edss_diagnosis" value="0"><span>0</span></label>
+        <label class="option"><input type="radio" name="edss_diagnosis" value="1.0–1.5"><span>1.0–1.5</span></label>
+        <label class="option"><input type="radio" name="edss_diagnosis" value="2.0–2.5"><span>2.0–2.5</span></label>
+        <label class="option"><input type="radio" name="edss_diagnosis" value="3.0–3.5"><span>3.0–3.5</span></label>
+        <label class="option"><input type="radio" name="edss_diagnosis" value="4.0–4.5"><span>4.0–4.5</span></label>
+        <label class="option"><input type="radio" name="edss_diagnosis" value="5.0–5.5"><span>5.0–5.5</span></label>
+        <label class="option"><input type="radio" name="edss_diagnosis" value="6.0–6.5"><span>6.0–6.5</span></label>
+        <label class="option"><input type="radio" name="edss_diagnosis" value="7.0–7.5"><span>7.0–7.5</span></label>
+        <label class="option"><input type="radio" name="edss_diagnosis" value="8.0–8.5"><span>8.0–8.5</span></label>
+        <label class="option"><input type="radio" name="edss_diagnosis" value="9.0–9.5"><span>9.0–9.5</span></label>
+        <label class="option"><input type="radio" name="edss_diagnosis" value="Не знам / не ми е известно"><span>Не знам / не ми е известно</span></label>
+      </div>
+    </div>
+
+    <div class="card">
+      <p class="q-title">6. Какъв е Вашият EDSS в момента?</p>
+      <div class="options">
+        <label class="option"><input type="radio" name="edss_current" value="0"><span>0</span></label>
+        <label class="option"><input type="radio" name="edss_current" value="1.0–1.5"><span>1.0–1.5</span></label>
+        <label class="option"><input type="radio" name="edss_current" value="2.0–2.5"><span>2.0–2.5</span></label>
+        <label class="option"><input type="radio" name="edss_current" value="3.0–3.5"><span>3.0–3.5</span></label>
+        <label class="option"><input type="radio" name="edss_current" value="4.0–4.5"><span>4.0–4.5</span></label>
+        <label class="option"><input type="radio" name="edss_current" value="5.0–5.5"><span>5.0–5.5</span></label>
+        <label class="option"><input type="radio" name="edss_current" value="6.0–6.5"><span>6.0–6.5</span></label>
+        <label class="option"><input type="radio" name="edss_current" value="7.0–7.5"><span>7.0–7.5</span></label>
+        <label class="option"><input type="radio" name="edss_current" value="8.0–8.5"><span>8.0–8.5</span></label>
+        <label class="option"><input type="radio" name="edss_current" value="9.0–9.5"><span>9.0–9.5</span></label>
+        <label class="option"><input type="radio" name="edss_current" value="Не знам / не ми е измерван"><span>Не знам / не ми е измерван</span></label>
+      </div>
+    </div>
+
+    <div class="card">
+      <p class="q-title">7. Спазвате ли определен хранителен режим / диета? <span class="required">*</span></p>
+      <div class="options">
+        <label class="option"><input type="radio" name="diet" value="Да" required><span>Да</span></label>
+        <label class="option"><input type="radio" name="diet" value="Не"><span>Не</span></label>
+      </div>
+      <div id="dietDetails" class="subquestion hidden">
+        <p class="q-title" style="font-size:16px">Какъв хранителен режим / диета? (може да изберете повече от един)</p>
+        <div class="options">
+          <label class="option"><input type="checkbox" name="diet_type" value="Средиземноморска диета"><span>Средиземноморска диета</span></label>
+          <label class="option"><input type="checkbox" name="diet_type" value="Кето / нисковъглехидратна диета"><span>Кето / нисковъглехидратна диета</span></label>
+          <label class="option"><input type="checkbox" name="diet_type" value="Вегетарианска"><span>Вегетарианска</span></label>
+          <label class="option"><input type="checkbox" name="diet_type" value="Веган"><span>Веган</span></label>
+          <label class="option"><input type="checkbox" name="diet_type" value="Безглутенова"><span>Безглутенова</span></label>
+          <label class="option"><input type="checkbox" name="diet_type" value="Без млечни продукти"><span>Без млечни продукти</span></label>
+          <label class="option"><input type="checkbox" name="diet_type" value="Не спазвам конкретна диета, но се старая да се храня здравословно"><span>Не спазвам конкретна диета, но се старая да се храня здравословно</span></label>
+          <label class="option"><input type="checkbox" name="diet_type" value="Друга"><span>Друга</span></label>
+        </div>
+        <p style="margin-top:12px"><input type="text" name="diet_other" placeholder="Ако е „Друга“, опишете (по желание)"></p>
+      </div>
+    </div>
+
+    <div class="card">
+      <p class="q-title">8. Тренирате ли или извършвате ли редовна физическа активност? <span class="required">*</span></p>
+      <div class="options">
+        <label class="option"><input type="radio" name="exercise" value="Да" required><span>Да</span></label>
+        <label class="option"><input type="radio" name="exercise" value="Не"><span>Не</span></label>
+      </div>
+      <div id="exerciseDetails" class="subquestion hidden">
+        <p class="q-title" style="font-size:16px">Какъв вид физическа активност практикувате? (може да изберете повече от един)</p>
+        <div class="options">
+          <label class="option"><input type="checkbox" name="exercise_type" value="Ходене"><span>Ходене</span></label>
+          <label class="option"><input type="checkbox" name="exercise_type" value="Бягане"><span>Бягане</span></label>
+          <label class="option"><input type="checkbox" name="exercise_type" value="Фитнес / силови тренировки"><span>Фитнес / силови тренировки</span></label>
+          <label class="option"><input type="checkbox" name="exercise_type" value="Йога / пилатес"><span>Йога / пилатес</span></label>
+          <label class="option"><input type="checkbox" name="exercise_type" value="Плуване"><span>Плуване</span></label>
+          <label class="option"><input type="checkbox" name="exercise_type" value="Колоездене"><span>Колоездене</span></label>
+          <label class="option"><input type="checkbox" name="exercise_type" value="Рехабилитация / лечебна физкултура"><span>Рехабилитация / лечебна физкултура</span></label>
+          <label class="option"><input type="checkbox" name="exercise_type" value="Друг спорт"><span>Друг спорт</span></label>
+          <label class="option"><input type="checkbox" name="exercise_type" value="Друго"><span>Друго</span></label>
+        </div>
+        <p style="margin-top:12px"><input type="text" name="exercise_other" placeholder="Ако е „Друго“, опишете (по желание)"></p>
+
+        <div class="subquestion" style="margin-top:18px">
+          <p class="q-title" style="font-size:16px">Колко често?</p>
+          <div class="options">
+            <label class="option"><input type="radio" name="exercise_frequency" value="По-рядко от 1 път седмично"><span>По-рядко от 1 път седмично</span></label>
+            <label class="option"><input type="radio" name="exercise_frequency" value="1–2 пъти седмично"><span>1–2 пъти седмично</span></label>
+            <label class="option"><input type="radio" name="exercise_frequency" value="3–4 пъти седмично"><span>3–4 пъти седмично</span></label>
+            <label class="option"><input type="radio" name="exercise_frequency" value="5 или повече пъти седмично"><span>5 или повече пъти седмично</span></label>
+            <label class="option"><input type="radio" name="exercise_frequency" value="Всеки ден"><span>Всеки ден</span></label>
+          </div>
+        </div>
+
+        <div class="subquestion" style="margin-top:18px">
+          <p class="q-title" style="font-size:16px">Средно колко време продължава една тренировка / физическа активност?</p>
+          <div class="options">
+            <label class="option"><input type="radio" name="exercise_duration" value="Под 20 минути"><span>Под 20 минути</span></label>
+            <label class="option"><input type="radio" name="exercise_duration" value="20–30 минути"><span>20–30 минути</span></label>
+            <label class="option"><input type="radio" name="exercise_duration" value="30–60 минути"><span>30–60 минути</span></label>
+            <label class="option"><input type="radio" name="exercise_duration" value="Над 60 минути"><span>Над 60 минути</span></label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <label class="option" style="border:0;padding:0">
+        <input type="checkbox" id="consent" required>
+        <span>Потвърждавам, че участвам доброволно и съм съгласен/съгласна отговорите ми да бъдат използвани за обобщен анализ. <span class="required">*</span></span>
+      </label>
+    </div>
+
+    <div class="actions">
+      <button id="submitBtn" type="submit">Изпрати анкетата</button>
+      <span class="status">Резултатите се записват в таблицата на организатора.</span>
+    </div>
+
+    <div id="success" class="success">Благодарим Ви! Отговорите са изпратени успешно.</div>
+    <div id="error" class="error">Възникна проблем при изпращането. Проверете интернет връзката и опитайте отново.</div>
+  </form>
+
+  <footer>Множествена склероза — Актуално</footer>
+</div>
+
+<script>
+  // Постави тук URL адреса на публикувания Google Apps Script Web App.
+  const SCRIPT_URL = "PASTE_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE";
+
+  const form = document.getElementById("surveyForm");
+  const submitBtn = document.getElementById("submitBtn");
+  const success = document.getElementById("success");
+  const error = document.getElementById("error");
+
+  function toggleDetails(radioName, detailsId){
+    const selected = document.querySelector(`input[name="${radioName}"]:checked`);
+    const box = document.getElementById(detailsId);
+    box.classList.toggle("hidden", !selected || selected.value !== "Да");
+  }
+
+  document.querySelectorAll('input[name="diet"]').forEach(el =>
+    el.addEventListener("change", () => toggleDetails("diet","dietDetails"))
+  );
+  document.querySelectorAll('input[name="exercise"]').forEach(el =>
+    el.addEventListener("change", () => toggleDetails("exercise","exerciseDetails"))
+  );
+
+  function values(name){
+    return [...document.querySelectorAll(`input[name="${name}"]:checked`)].map(x => x.value);
+  }
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    success.style.display = "none";
+    error.style.display = "none";
+
+    if (!form.checkValidity()){
+      form.reportValidity();
+      return;
+    }
+    if (SCRIPT_URL.includes("PASTE_GOOGLE")){
+      error.textContent = "Анкетата още не е свързана с Google Sheets. Организаторът трябва да постави URL адреса на Google Apps Script.";
+      error.style.display = "block";
+      return;
+    }
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Изпращане…";
+
+    const payload = {
+      timestamp: new Date().toISOString(),
+      years_ms: document.querySelector('input[name="years_ms"]:checked')?.value || "",
+      age: document.querySelector('input[name="age"]:checked')?.value || "",
+      smoking: document.querySelector('input[name="smoking"]:checked')?.value || "",
+      alcohol: document.querySelector('input[name="alcohol"]:checked')?.value || "",
+      edss_diagnosis: document.querySelector('input[name="edss_diagnosis"]:checked')?.value || "",
+      edss_current: document.querySelector('input[name="edss_current"]:checked')?.value || "",
+      diet: document.querySelector('input[name="diet"]:checked')?.value || "",
+      diet_type: values("diet_type").join(", "),
+      diet_other: document.querySelector('input[name="diet_other"]')?.value || "",
+      exercise: document.querySelector('input[name="exercise"]:checked')?.value || "",
+      exercise_type: values("exercise_type").join(", "),
+      exercise_other: document.querySelector('input[name="exercise_other"]')?.value || "",
+      exercise_frequency: document.querySelector('input[name="exercise_frequency"]:checked')?.value || "",
+      exercise_duration: document.querySelector('input[name="exercise_duration"]:checked')?.value || "",
+      consent: document.getElementById("consent").checked ? "Да" : "Не"
+    };
+
+    try{
+      await fetch(SCRIPT_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: {"Content-Type":"text/plain;charset=utf-8"},
+        body: JSON.stringify(payload)
+      });
+      form.reset();
+      toggleDetails("diet","dietDetails");
+      toggleDetails("exercise","exerciseDetails");
+      success.style.display = "block";
+      window.scrollTo({top:document.body.scrollHeight, behavior:"smooth"});
+    }catch(err){
+      console.error(err);
+      error.style.display = "block";
+    }finally{
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Изпрати анкетата";
+    }
+  });
+</script>
+</body>
+</html>
