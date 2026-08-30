@@ -171,18 +171,42 @@
         <label class="option"><input type="radio" name="alcohol" value="Да" required><span>Да</span></label>
         <label class="option"><input type="radio" name="alcohol" value="Не"><span>Не</span></label>
       </div>
+
       <div id="alcoholDetails" class="subquestion hidden">
-        <p class="q-title" style="font-size:16px">Ако сте отговорили „Да“ – по колко на ден обикновено?</p>
-        <p class="help">Изберете категория според вида, количеството и честотата на употреба.</p>
+        <p class="q-title" style="font-size:16px">Колко често употребявате алкохол?</p>
         <div class="options">
-          <label class="option"><input type="radio" name="alcohol_amount" value="Слабоалкохолни – до 500 мл – ежедневно"><span>Слабоалкохолни – до 500 мл – ежедневно</span></label>
-          <label class="option"><input type="radio" name="alcohol_amount" value="Слабоалкохолни – до 500 мл – 2–3 пъти седмично"><span>Слабоалкохолни – до 500 мл – 2–3 пъти седмично</span></label>
-          <label class="option"><input type="radio" name="alcohol_amount" value="Слабоалкохолни – до 500 мл – рядко (около 1 път месечно)"><span>Слабоалкохолни – до 500 мл – рядко (около 1 път месечно)</span></label>
-          <label class="option"><input type="radio" name="alcohol_amount" value="Слабоалкохолни – до 500 мл – много рядко (на 3–6 месеца)"><span>Слабоалкохолни – до 500 мл – много рядко (на 3–6 месеца)</span></label>
-          <label class="option"><input type="radio" name="alcohol_amount" value="Силноалкохолни – до 50 мл – ежедневно"><span>Силноалкохолни – до 50 мл – ежедневно</span></label>
-          <label class="option"><input type="radio" name="alcohol_amount" value="Силноалкохолни – до 50 мл – 2–3 пъти седмично"><span>Силноалкохолни – до 50 мл – 2–3 пъти седмично</span></label>
-          <label class="option"><input type="radio" name="alcohol_amount" value="Силноалкохолни – до 50 мл – рядко (около 1 път месечно)"><span>Силноалкохолни – до 50 мл – рядко (около 1 път месечно)</span></label>
-          <label class="option"><input type="radio" name="alcohol_amount" value="Силноалкохолни – до 50 мл – много рядко (на 3–6 месеца)"><span>Силноалкохолни – до 50 мл – много рядко (на 3–6 месеца)</span></label>
+          <label class="option"><input type="radio" name="alcohol_frequency" value="Ежедневно"><span>Ежедневно</span></label>
+          <label class="option"><input type="radio" name="alcohol_frequency" value="2–3 пъти седмично"><span>2–3 пъти седмично</span></label>
+          <label class="option"><input type="radio" name="alcohol_frequency" value="Рядко – около 1 път месечно"><span>Рядко – около 1 път месечно</span></label>
+          <label class="option"><input type="radio" name="alcohol_frequency" value="Много рядко – на 3–6 месеца"><span>Много рядко – на 3–6 месеца</span></label>
+        </div>
+
+        <div class="subquestion" style="margin-top:18px">
+          <p class="q-title" style="font-size:16px">Какъв алкохол употребявате?</p>
+          <p class="help">Може да изберете и двата вида.</p>
+          <div class="options">
+            <label class="option"><input type="checkbox" name="alcohol_type" value="Слабоалкохолни"><span>Слабоалкохолни напитки</span></label>
+            <label class="option"><input type="checkbox" name="alcohol_type" value="Силноалкохолни"><span>Силноалкохолни напитки</span></label>
+          </div>
+        </div>
+
+        <div id="alcoholWeakDetails" class="subquestion hidden">
+          <p class="q-title" style="font-size:16px">Количество слабоалкохолни напитки</p>
+          <p class="help">Колко обикновено приемате при един повод?</p>
+          <div class="options">
+            <label class="option"><input type="radio" name="alcohol_weak_amount" value="До 500 мл"><span>До 500 мл</span></label>
+            <label class="option"><input type="radio" name="alcohol_weak_amount" value="Над 500 мл"><span>Над 500 мл</span></label>
+          </div>
+        </div>
+
+        <div id="alcoholStrongDetails" class="subquestion hidden">
+          <p class="q-title" style="font-size:16px">Количество силноалкохолни напитки</p>
+          <p class="help">Колко обикновено приемате при един повод?</p>
+          <div class="options">
+            <label class="option"><input type="radio" name="alcohol_strong_amount" value="До 25 мл"><span>До 25 мл</span></label>
+            <label class="option"><input type="radio" name="alcohol_strong_amount" value="До 100 мл"><span>До 100 мл</span></label>
+            <label class="option"><input type="radio" name="alcohol_strong_amount" value="Над 100 мл"><span>Над 100 мл</span></label>
+          </div>
         </div>
       </div>
     </div>
@@ -513,7 +537,24 @@
     el.addEventListener("change", () => toggleDetails("smoking","smokingDetails"))
   );
   document.querySelectorAll('input[name="alcohol"]').forEach(el =>
-    el.addEventListener("change", () => toggleDetails("alcohol","alcoholDetails"))
+    el.addEventListener("change", () => {
+      toggleDetails("alcohol","alcoholDetails");
+      if (el.checked && el.value === "Не") {
+        document.querySelectorAll('input[name="alcohol_type"], input[name="alcohol_weak_amount"], input[name="alcohol_strong_amount"], input[name="alcohol_frequency"]').forEach(x => x.checked = false);
+        document.getElementById("alcoholWeakDetails").classList.add("hidden");
+        document.getElementById("alcoholStrongDetails").classList.add("hidden");
+      }
+    })
+  );
+  document.querySelectorAll('input[name="alcohol_type"]').forEach(el =>
+    el.addEventListener("change", () => {
+      const weak = document.querySelector('input[name="alcohol_type"][value="Слабоалкохолни"]')?.checked;
+      const strong = document.querySelector('input[name="alcohol_type"][value="Силноалкохолни"]')?.checked;
+      document.getElementById("alcoholWeakDetails").classList.toggle("hidden", !weak);
+      document.getElementById("alcoholStrongDetails").classList.toggle("hidden", !strong);
+      if (!weak) document.querySelectorAll('input[name="alcohol_weak_amount"]').forEach(x => x.checked = false);
+      if (!strong) document.querySelectorAll('input[name="alcohol_strong_amount"]').forEach(x => x.checked = false);
+    })
   );
   document.querySelectorAll('input[name="diet"]').forEach(el =>
     el.addEventListener("change", () => toggleDetails("diet","dietDetails"))
@@ -574,7 +615,10 @@
       smoking: document.querySelector('input[name="smoking"]:checked')?.value || "",
       smoking_since: document.querySelector('input[name="smoking_since"]:checked')?.value || "",
       alcohol: document.querySelector('input[name="alcohol"]:checked')?.value || "",
-      alcohol_amount: document.querySelector('input[name="alcohol_amount"]:checked')?.value || "",
+      alcohol_frequency: document.querySelector('input[name="alcohol_frequency"]:checked')?.value || "",
+      alcohol_type: values("alcohol_type").join(", "),
+      alcohol_weak_amount: document.querySelector('input[name="alcohol_weak_amount"]:checked')?.value || "",
+      alcohol_strong_amount: document.querySelector('input[name="alcohol_strong_amount"]:checked')?.value || "",
       edss_diagnosis: document.querySelector('input[name="edss_diagnosis"]:checked')?.value || "",
       edss_current: document.querySelector('input[name="edss_current"]:checked')?.value || "",
       diet: document.querySelector('input[name="diet"]:checked')?.value || "",
@@ -620,6 +664,8 @@
       form.reset();
       toggleDetails("smoking","smokingDetails");
       toggleDetails("alcohol","alcoholDetails");
+      document.getElementById("alcoholWeakDetails").classList.add("hidden");
+      document.getElementById("alcoholStrongDetails").classList.add("hidden");
       toggleDetails("diet","dietDetails");
       toggleDetails("exercise","exerciseDetails");
       toggleTherapyDetails();
