@@ -69,21 +69,6 @@
       border-color:#e6a1a1;
       box-shadow:0 7px 22px rgba(190,50,50,.08);
     }
-    #q8.is-answered,#q8.is-unanswered,#q8.is-invalid{
-      background:var(--card);
-      border-color:#e7ebf0;
-      box-shadow:0 5px 18px rgba(16,45,84,.05);
-    }
-    .validation-started .card{
-      transition:background .2s ease,border-color .2s ease,box-shadow .2s ease;
-    }
-    .card.is-invalid:target{scroll-margin-top:18px}
-    .subquestion.is-invalid{
-      background:#fff1f1;
-      border-radius:10px;
-      padding:12px 12px 12px 14px;
-      margin-top:14px;
-    }
     .question-error{
       display:none;
       margin:10px 0 0;
@@ -656,266 +641,430 @@
   const success = document.getElementById("success");
   const error = document.getElementById("error");
 
-  function values(name){
-    return [...document.querySelectorAll(`input[name="${name}"]:checked`)].map(x => x.value);
+
+  // ---------- Generic helpers ----------
+  function checked(name){
+    return document.querySelector(`input[name="${name}"]:checked`);
   }
 
-  function hasValue(name){
-    return !!document.querySelector(`input[name="${name}"]:checked`);
+  function checkedValues(name){
+    return [...document.querySelectorAll(`input[name="${name}"]:checked`)].map(el => el.value);
   }
 
-  function textFilled(name){
-    const el=document.querySelector(`[name="${name}"]`);
-    return !!el && !!el.value.trim();
+  function filled(name){
+    const el = document.querySelector(`[name="${name}"]`);
+    return !!el && String(el.value || "").trim() !== "";
   }
 
-  function selectFilled(name){
-    const el=document.querySelector(`select[name="${name}"]`);
-    return !!el && !!el.value;
+  function selected(name){
+    const el = document.querySelector(`select[name="${name}"]`);
+    return !!el && String(el.value || "").trim() !== "";
   }
 
-  function markField(name, ok){
-    const els=[...document.querySelectorAll(`[name="${name}"]`)];
-    els.forEach(el=>el.classList.toggle("field-invalid", !ok));
+  function card(id){
+    return document.getElementById(id);
   }
 
-  function clearFieldMarks(card){
-    if(!card) return;
-    card.querySelectorAll(".field-invalid").forEach(el=>el.classList.remove("field-invalid"));
-  }
-
-  function setCard(card, ok, optional=false){
-    if(!card) return;
-    card.classList.remove("is-invalid","is-answered","is-unanswered");
-    if(!form.classList.contains("validation-started")) return;
-    if(optional) return;
-    card.classList.add(ok ? "is-answered" : "is-unanswered");
-  }
-
-  function getStates(){
-    const q=id=>document.getElementById(id);
-    const states=[];
-
-    states.push({id:"q1",ok:hasValue("years_ms"),fields:[["years_ms",hasValue("years_ms")]]});
-    states.push({id:"q2",ok:hasValue("age"),fields:[["age",hasValue("age")]]});
-
-    const smoking=document.querySelector('input[name="smoking"]:checked')?.value||"";
-    let smokingOk=!!smoking;
-    const smokingFields=[];
-    if(!smoking) smokingFields.push(["smoking",false]);
-    if(smoking==="Да"){
-      const ok=hasValue("smoking_since");
-      smokingOk=ok; smokingFields.push(["smoking_since",ok]);
-    }
-    if(smoking==="Отказах ги"){
-      const ok=hasValue("smoking_quit_since");
-      smokingOk=ok; smokingFields.push(["smoking_quit_since",ok]);
-    }
-    states.push({id:"q3",ok:smokingOk,fields:smokingFields});
-
-    const alcohol=document.querySelector('input[name="alcohol"]:checked')?.value||"";
-    let alcoholOk=!!alcohol;
-    const af=[];
-    if(!alcohol) af.push(["alcohol",false]);
-    if(alcohol==="Да"){
-      const freq=hasValue("alcohol_frequency");
-      const types=values("alcohol_type");
-      const typeOk=types.length>0;
-      const weak=types.includes("Слабоалкохолни");
-      const strong=types.includes("Силноалкохолни");
-      const weakOk=!weak||hasValue("alcohol_weak_amount");
-      const strongOk=!strong||hasValue("alcohol_strong_amount");
-      alcoholOk=freq&&typeOk&&weakOk&&strongOk;
-      af.push(["alcohol_frequency",freq],["alcohol_type",typeOk]);
-      if(weak) af.push(["alcohol_weak_amount",weakOk]);
-      if(strong) af.push(["alcohol_strong_amount",strongOk]);
-    }
-    states.push({id:"q4",ok:alcoholOk,fields:af});
-
-    states.push({id:"q5",ok:hasValue("edss_diagnosis"),fields:[["edss_diagnosis",hasValue("edss_diagnosis")]]});
-    states.push({id:"q6",ok:hasValue("edss_current"),fields:[["edss_current",hasValue("edss_current")]]});
-
-    const symptoms=values("symptoms");
-    const symOk=symptoms.length>0&&(!symptoms.includes("Друго")||textFilled("symptoms_other"));
-    const sf=[["symptoms",symptoms.length>0]];
-    if(symptoms.includes("Друго")) sf.push(["symptoms_other",textFilled("symptoms_other")]);
-    states.push({id:"q7",ok:symOk,fields:sf});
-
-    states.push({id:"q8",ok:true,optional:true,fields:[]});
-
-    ["q9","q10","q11","q12"].forEach((id,i)=>{
-      const names=["relapse_12m","mri_12m","walking_aid","daily_impact"];
-      states.push({id,ok:hasValue(names[i]),fields:[[names[i],hasValue(names[i])]]});
+  function clearValidationClasses(){
+    document.querySelectorAll(".card").forEach(c => {
+      c.classList.remove("is-answered","is-unanswered","is-invalid");
     });
-
-    const therapy=document.querySelector('input[name="therapy_status"]:checked')?.value||"";
-    let therapyOk=!!therapy; const tf=[["therapy_status",!!therapy]];
-    if(therapy==="Да – първа линия"){
-      const a=values("therapy_first"), other=a.includes("Друго");
-      const ok=a.length>0 && (!other||textFilled("therapy_first_other"));
-      therapyOk=ok; tf.push(["therapy_first",a.length>0]); if(other) tf.push(["therapy_first_other",textFilled("therapy_first_other")]);
-    } else if(therapy==="Да – втора линия"){
-      const a=values("therapy_second"), other=a.includes("Друго");
-      const ok=a.length>0 && (!other||textFilled("therapy_second_other"));
-      therapyOk=ok; tf.push(["therapy_second",a.length>0]); if(other) tf.push(["therapy_second_other",textFilled("therapy_second_other")]);
-    } else if(therapy==="Да – друга / не знам към коя линия спада"){
-      therapyOk=textFilled("therapy_other"); tf.push(["therapy_other",therapyOk]);
-    }
-    states.push({id:"q13",ok:therapyOk,fields:tf});
-
-    const hsct=document.querySelector('input[name="hsct"]:checked')?.value||"";
-    let hsctOk=!!hsct; const hf=[["hsct",!!hsct]];
-    if(hsct==="Да"){
-      const a=selectFilled("hsct_time"), b=textFilled("hsct_edss_before"), c=hasValue("hsct_edss_change"), d=textFilled("hsct_effects");
-      hsctOk=a&&b&&c&&d;
-      hf.push(["hsct_time",a],["hsct_edss_before",b],["hsct_edss_change",c],["hsct_effects",d]);
-    }
-    states.push({id:"q14",ok:hsctOk,fields:hf});
-
-    const supp=document.querySelector('input[name="supplements"]:checked')?.value||"";
-    let suppOk=!!supp; const sp=[["supplements",!!supp]];
-    if(supp==="Да"){
-      const a=values("supplement_type"), vd=a.includes("Витамин D"), other=a.includes("Други");
-      suppOk=a.length>0&&(!vd||hasValue("vitamin_d_dose"))&&(!other||textFilled("supplements_other"));
-      sp.push(["supplement_type",a.length>0]); if(vd) sp.push(["vitamin_d_dose",hasValue("vitamin_d_dose")]); if(other) sp.push(["supplements_other",textFilled("supplements_other")]);
-    }
-    states.push({id:"q15",ok:suppOk,fields:sp});
-
-    const diet=document.querySelector('input[name="diet"]:checked')?.value||"";
-    let dietOk=!!diet; const df=[["diet",!!diet]];
-    if(diet==="Да"){
-      const a=values("diet_type"), other=a.includes("Друга");
-      dietOk=a.length>0&&(!other||textFilled("diet_other"));
-      df.push(["diet_type",a.length>0]); if(other) df.push(["diet_other",textFilled("diet_other")]);
-    }
-    states.push({id:"q16",ok:dietOk,fields:df});
-
-    const exercise=document.querySelector('input[name="exercise"]:checked')?.value||"";
-    let exerciseOk=!!exercise; const ef=[["exercise",!!exercise]];
-    if(exercise==="Да"){
-      const a=values("exercise_type"), other=a.includes("Друго");
-      exerciseOk=a.length>0&&(!other||textFilled("exercise_other"))&&hasValue("exercise_frequency")&&hasValue("exercise_duration");
-      ef.push(["exercise_type",a.length>0]);
-      if(other) ef.push(["exercise_other",textFilled("exercise_other")]);
-      ef.push(["exercise_frequency",hasValue("exercise_frequency")],["exercise_duration",hasValue("exercise_duration")]);
-    }
-    states.push({id:"q17",ok:exerciseOk,fields:ef});
-
-    const consent=document.getElementById("consent");
-    states.push({id:"q18",ok:!!consent?.checked,fields:[["consent",!!consent?.checked]]});
-    return states;
+    document.querySelectorAll(".field-invalid").forEach(el => el.classList.remove("field-invalid"));
   }
 
-  function updateQuestionColors(){
-    if(!form.classList.contains("validation-started")) return;
-    getStates().forEach(s=>{
-      const card=document.getElementById(s.id);
-      setCard(card,s.ok,!!s.optional);
-      s.fields.forEach(([name,ok])=>{
-        // Only mark field-level problems after validation has started.
-        if(!ok) markField(name,false);
-        else document.querySelectorAll(`[name="${name}"]`).forEach(el=>el.classList.remove("field-invalid"));
-      });
-    });
+  function colorCard(id, ok, optional=false){
+    const c = card(id);
+    if (!c) return;
+    c.classList.remove("is-answered","is-unanswered","is-invalid");
+    if (!form.classList.contains("validation-started")) return;
+    if (optional) return;
+    c.classList.add(ok ? "is-answered" : "is-unanswered");
   }
 
-  function validateSurvey(){
-    form.classList.add("validation-started");
-    const states=getStates();
-    states.forEach(s=>{
-      const card=document.getElementById(s.id);
-      clearFieldMarks(card);
-      setCard(card,s.ok,!!s.optional);
-      s.fields.forEach(([name,ok])=>{ if(!ok) markField(name,false); });
-      if(!s.ok) card.classList.add("is-invalid");
-    });
-    const invalid=states.find(s=>!s.optional&&!s.ok);
-    if(invalid){
-      const card=document.getElementById(invalid.id);
-      let message="Моля, попълнете задължителните полета в този въпрос.";
-      if(invalid.id==="q14"){
-        const hsct=document.querySelector('input[name="hsct"]:checked')?.value;
-        if(hsct==="Да") message="Моля, попълнете всички подвъпроси за HSCT, включително „Как Ви повлия HSCT като цяло?“.";
-      }
-      const err=card.querySelector(".question-error");
-      if(err) err.textContent=message;
-      card.scrollIntoView({behavior:"smooth",block:"center"});
-      const firstBad=invalid.fields.find(([name,ok])=>!ok);
-      const focusable=firstBad ? document.querySelector(`[name="${firstBad[0]}"]`) : card.querySelector("input,select,textarea");
-      if(focusable) setTimeout(()=>focusable.focus({preventScroll:true}),250);
-      return false;
-    }
-    return true;
+  function markBad(name){
+    document.querySelectorAll(`[name="${name}"]`).forEach(el => el.classList.add("field-invalid"));
   }
 
+  // ---------- Conditional UI ----------
   function toggleSmoking(){
-    const selected=document.querySelector('input[name="smoking"]:checked')?.value||"";
-    document.getElementById("smokingDetails").classList.toggle("hidden",selected!=="Да");
-    document.getElementById("smokingQuitDetails").classList.toggle("hidden",selected!=="Отказах ги");
-    if(selected!=="Да") document.querySelectorAll('input[name="smoking_since"]').forEach(x=>x.checked=false);
-    if(selected!=="Отказах ги") document.querySelectorAll('input[name="smoking_quit_since"]').forEach(x=>x.checked=false);
+    const v = checked("smoking")?.value || "";
+    document.getElementById("smokingDetails").classList.toggle("hidden", v !== "Да");
+    document.getElementById("smokingQuitDetails").classList.toggle("hidden", v !== "Отказах ги");
+
+    if (v !== "Да")
+      document.querySelectorAll('input[name="smoking_since"]').forEach(x => x.checked = false);
+    if (v !== "Отказах ги")
+      document.querySelectorAll('input[name="smoking_quit_since"]').forEach(x => x.checked = false);
   }
 
   function toggleAlcohol(){
-    const selected=document.querySelector('input[name="alcohol"]:checked')?.value||"";
-    document.getElementById("alcoholDetails").classList.toggle("hidden",selected!=="Да");
-    if(selected==="Не"){
-      document.querySelectorAll('input[name="alcohol_frequency"],input[name="alcohol_type"],input[name="alcohol_weak_amount"],input[name="alcohol_strong_amount"]').forEach(x=>x.checked=false);
+    const v = checked("alcohol")?.value || "";
+    document.getElementById("alcoholDetails").classList.toggle("hidden", v !== "Да");
+
+    if (v !== "Да"){
+      document.querySelectorAll(
+        'input[name="alcohol_frequency"],input[name="alcohol_type"],' +
+        'input[name="alcohol_weak_amount"],input[name="alcohol_strong_amount"]'
+      ).forEach(x => x.checked = false);
       document.getElementById("alcoholWeakDetails").classList.add("hidden");
       document.getElementById("alcoholStrongDetails").classList.add("hidden");
     }
   }
 
   function toggleAlcoholType(){
-    const weak=document.querySelector('input[name="alcohol_type"][value="Слабоалкохолни"]')?.checked;
-    const strong=document.querySelector('input[name="alcohol_type"][value="Силноалкохолни"]')?.checked;
-    document.getElementById("alcoholWeakDetails").classList.toggle("hidden",!weak);
-    document.getElementById("alcoholStrongDetails").classList.toggle("hidden",!strong);
-    if(!weak) document.querySelectorAll('input[name="alcohol_weak_amount"]').forEach(x=>x.checked=false);
-    if(!strong) document.querySelectorAll('input[name="alcohol_strong_amount"]').forEach(x=>x.checked=false);
+    const weak = !!document.querySelector('input[name="alcohol_type"][value="Слабоалкохолни"]')?.checked;
+    const strong = !!document.querySelector('input[name="alcohol_type"][value="Силноалкохолни"]')?.checked;
+
+    document.getElementById("alcoholWeakDetails").classList.toggle("hidden", !weak);
+    document.getElementById("alcoholStrongDetails").classList.toggle("hidden", !strong);
+
+    if (!weak)
+      document.querySelectorAll('input[name="alcohol_weak_amount"]').forEach(x => x.checked = false);
+    if (!strong)
+      document.querySelectorAll('input[name="alcohol_strong_amount"]').forEach(x => x.checked = false);
   }
 
-  function toggleDetails(radioName,detailsId){
-    const selected=document.querySelector(`input[name="${radioName}"]:checked`);
-    const box=document.getElementById(detailsId);
-    if(box) box.classList.toggle("hidden",!selected||selected.value!=="Да");
+  function toggleDetails(radioName, detailsId){
+    const v = checked(radioName)?.value || "";
+    const box = document.getElementById(detailsId);
+    if (box) box.classList.toggle("hidden", v !== "Да");
   }
 
   function toggleTherapyDetails(){
-    const selected=document.querySelector('input[name="therapy_status"]:checked')?.value||"";
-    document.getElementById("therapyFirst").classList.toggle("hidden",selected!=="Да – първа линия");
-    document.getElementById("therapySecond").classList.toggle("hidden",selected!=="Да – втора линия");
-    document.getElementById("therapyOther").classList.toggle("hidden",!selected.startsWith("Да – друга"));
+    const v = checked("therapy_status")?.value || "";
+    document.getElementById("therapyFirst").classList.toggle("hidden", v !== "Да – първа линия");
+    document.getElementById("therapySecond").classList.toggle("hidden", v !== "Да – втора линия");
+    document.getElementById("therapyOther").classList.toggle("hidden", !v.startsWith("Да – друга"));
   }
 
   function toggleHsctDetails(){
-    const selected=document.querySelector('input[name="hsct"]:checked')?.value||"";
-    document.getElementById("hsctDetails").classList.toggle("hidden",selected!=="Да");
+    const v = checked("hsct")?.value || "";
+    document.getElementById("hsctDetails").classList.toggle("hidden", v !== "Да");
   }
 
   function toggleSupplementDetails(){
-    const selected=document.querySelector('input[name="supplements"]:checked')?.value||"";
-    const box=document.getElementById("supplementDetails");
-    if(box) box.classList.toggle("hidden",selected!=="Да");
-    const vitaminD=document.querySelector('input[name="supplement_type"][value="Витамин D"]')?.checked;
-    const vd=document.getElementById("vitaminDDetails");
-    if(vd) vd.classList.toggle("hidden",!vitaminD);
+    const v = checked("supplements")?.value || "";
+    const box = document.getElementById("supplementDetails");
+    if (box) box.classList.toggle("hidden", v !== "Да");
+
+    const vd = !!document.querySelector('input[name="supplement_type"][value="Витамин D"]')?.checked;
+    const vdBox = document.getElementById("vitaminDDetails");
+    if (vdBox) vdBox.classList.toggle("hidden", !vd);
   }
 
-  document.querySelectorAll('input[name="smoking"]').forEach(el=>el.addEventListener("change",()=>{toggleSmoking(); if(form.classList.contains("validation-started")) updateQuestionColors();}));
-  document.querySelectorAll('input[name="alcohol"]').forEach(el=>el.addEventListener("change",()=>{toggleAlcohol(); if(form.classList.contains("validation-started")) updateQuestionColors();}));
-  document.querySelectorAll('input[name="alcohol_type"]').forEach(el=>el.addEventListener("change",()=>{toggleAlcoholType(); if(form.classList.contains("validation-started")) updateQuestionColors();}));
-  document.querySelectorAll('input[name="diet"]').forEach(el=>el.addEventListener("change",()=>{toggleDetails("diet","dietDetails"); if(form.classList.contains("validation-started")) updateQuestionColors();}));
-  document.querySelectorAll('input[name="exercise"]').forEach(el=>el.addEventListener("change",()=>{toggleDetails("exercise","exerciseDetails"); if(form.classList.contains("validation-started")) updateQuestionColors();}));
-  document.querySelectorAll('input[name="therapy_status"]').forEach(el=>el.addEventListener("change",()=>{toggleTherapyDetails(); if(form.classList.contains("validation-started")) updateQuestionColors();}));
-  document.querySelectorAll('input[name="hsct"]').forEach(el=>el.addEventListener("change",()=>{toggleHsctDetails(); if(form.classList.contains("validation-started")) updateQuestionColors();}));
-  document.querySelectorAll('input[name="supplements"]').forEach(el=>el.addEventListener("change",()=>{toggleSupplementDetails(); if(form.classList.contains("validation-started")) updateQuestionColors();}));
-  document.querySelectorAll('input[name="supplement_type"]').forEach(el=>el.addEventListener("change",()=>{toggleSupplementDetails(); if(form.classList.contains("validation-started")) updateQuestionColors();}));
+  function refreshUI(){
+    toggleSmoking();
+    toggleAlcohol();
+    toggleAlcoholType();
+    toggleDetails("diet","dietDetails");
+    toggleDetails("exercise","exerciseDetails");
+    toggleTherapyDetails();
+    toggleHsctDetails();
+    toggleSupplementDetails();
+  }
 
-  form.addEventListener("change",()=>{ if(form.classList.contains("validation-started")) updateQuestionColors(); });
-  form.addEventListener("input",()=>{ if(form.classList.contains("validation-started")) updateQuestionColors(); });
+  // ---------- One source of truth for all question requirements ----------
+  function getQuestionStates(){
+    const states = [];
 
-  form.addEventListener("submit",async e=>{
+    // Q1
+    states.push({
+      id:"q1",
+      ok:!!checked("years_ms"),
+      fields:[["years_ms", !!checked("years_ms")]]
+    });
+
+    // Q2
+    states.push({
+      id:"q2",
+      ok:!!checked("age"),
+      fields:[["age", !!checked("age")]]
+    });
+
+    // Q3 smoking
+    {
+      const v = checked("smoking")?.value || "";
+      let ok = !!v;
+      const fields = [["smoking", !!v]];
+      if (v === "Да"){
+        const sub = !!checked("smoking_since");
+        fields.push(["smoking_since", sub]);
+        ok = sub;
+      } else if (v === "Отказах ги"){
+        const sub = !!checked("smoking_quit_since");
+        fields.push(["smoking_quit_since", sub]);
+        ok = sub;
+      }
+      states.push({id:"q3", ok, fields});
+    }
+
+    // Q4 alcohol
+    {
+      const v = checked("alcohol")?.value || "";
+      let ok = !!v;
+      const fields = [["alcohol", !!v]];
+      if (v === "Да"){
+        const f = !!checked("alcohol_frequency");
+        const types = checkedValues("alcohol_type");
+        const t = types.length > 0;
+        const weak = types.includes("Слабоалкохолни");
+        const strong = types.includes("Силноалкохолни");
+        const wa = !!checked("alcohol_weak_amount");
+        const sa = !!checked("alcohol_strong_amount");
+
+        fields.push(["alcohol_frequency", f],["alcohol_type", t]);
+        if (weak) fields.push(["alcohol_weak_amount", wa]);
+        if (strong) fields.push(["alcohol_strong_amount", sa]);
+        ok = f && t && (!weak || wa) && (!strong || sa);
+      }
+      states.push({id:"q4", ok, fields});
+    }
+
+    // Q5-Q6 EDSS
+    states.push({id:"q5", ok:!!checked("edss_diagnosis"), fields:[["edss_diagnosis",!!checked("edss_diagnosis")]]});
+    states.push({id:"q6", ok:!!checked("edss_current"), fields:[["edss_current",!!checked("edss_current")]]});
+
+    // Q7 symptoms
+    {
+      const a = checkedValues("symptoms");
+      const any = a.length > 0;
+      const other = a.includes("Друго");
+      const otherOk = !other || filled("symptoms_other");
+      states.push({
+        id:"q7",
+        ok:any && otherOk,
+        fields:[["symptoms",any], ...(other ? [["symptoms_other",otherOk]] : [])]
+      });
+    }
+
+    // Q8 is the ONLY optional main question.
+    states.push({id:"q8", ok:true, optional:true, fields:[]});
+
+    // Q9-Q12
+    const qMap = [
+      ["q9","relapse_12m"],["q10","mri_12m"],["q11","walking_aid"],["q12","daily_impact"]
+    ];
+    qMap.forEach(([id,name]) => {
+      const ok=!!checked(name);
+      states.push({id,ok,fields:[[name,ok]]});
+    });
+
+    // Q13 therapy
+    {
+      const v = checked("therapy_status")?.value || "";
+      let ok = !!v;
+      const fields = [["therapy_status",!!v]];
+      if (v === "Да – първа линия"){
+        const a = checkedValues("therapy_first");
+        const has = a.length > 0;
+        const other = a.includes("Друго");
+        const otherOk = !other || filled("therapy_first_other");
+        fields.push(["therapy_first",has]);
+        if (other) fields.push(["therapy_first_other",otherOk]);
+        ok = has && otherOk;
+      } else if (v === "Да – втора линия"){
+        const a = checkedValues("therapy_second");
+        const has = a.length > 0;
+        const other = a.includes("Друго");
+        const otherOk = !other || filled("therapy_second_other");
+        fields.push(["therapy_second",has]);
+        if (other) fields.push(["therapy_second_other",otherOk]);
+        ok = has && otherOk;
+      } else if (v === "Да – друга / не знам към коя линия спада"){
+        const otherOk = filled("therapy_other");
+        fields.push(["therapy_other",otherOk]);
+        ok = otherOk;
+      }
+      states.push({id:"q13",ok,fields});
+    }
+
+    // Q14 HSCT
+    {
+      const v = checked("hsct")?.value || "";
+      let ok = !!v;
+      const fields = [["hsct",!!v]];
+      if (v === "Да"){
+        const a=selected("hsct_time");
+        const b=filled("hsct_edss_before");
+        const c=!!checked("hsct_edss_change");
+        const d=filled("hsct_effects");
+        fields.push(["hsct_time",a],["hsct_edss_before",b],["hsct_edss_change",c],["hsct_effects",d]);
+        ok = a && b && c && d;
+      }
+      states.push({id:"q14",ok,fields});
+    }
+
+    // Q15 supplements
+    {
+      const v=checked("supplements")?.value || "";
+      let ok=!!v;
+      const fields=[["supplements",!!v]];
+      if(v==="Да"){
+        const a=checkedValues("supplement_type");
+        const typeOk=a.length>0;
+        const vd=a.includes("Витамин D");
+        const other=a.includes("Други");
+        const vdOk=!vd||!!checked("vitamin_d_dose");
+        const otherOk=!other||filled("supplements_other");
+        fields.push(["supplement_type",typeOk]);
+        if(vd) fields.push(["vitamin_d_dose",vdOk]);
+        if(other) fields.push(["supplements_other",otherOk]);
+        ok=typeOk&&vdOk&&otherOk;
+      }
+      states.push({id:"q15",ok,fields});
+    }
+
+    // Q16 diet
+    {
+      const v=checked("diet")?.value || "";
+      let ok=!!v;
+      const fields=[["diet",!!v]];
+      if(v==="Да"){
+        const a=checkedValues("diet_type");
+        const typeOk=a.length>0;
+        const other=a.includes("Друга");
+        const otherOk=!other||filled("diet_other");
+        fields.push(["diet_type",typeOk]);
+        if(other) fields.push(["diet_other",otherOk]);
+        ok=typeOk&&otherOk;
+      }
+      states.push({id:"q16",ok,fields});
+    }
+
+    // Q17 exercise
+    {
+      const v=checked("exercise")?.value || "";
+      let ok=!!v;
+      const fields=[["exercise",!!v]];
+      if(v==="Да"){
+        const a=checkedValues("exercise_type");
+        const typeOk=a.length>0;
+        const other=a.includes("Друго");
+        const otherOk=!other||filled("exercise_other");
+        const f=!!checked("exercise_frequency");
+        const d=!!checked("exercise_duration");
+        fields.push(["exercise_type",typeOk]);
+        if(other) fields.push(["exercise_other",otherOk]);
+        fields.push(["exercise_frequency",f],["exercise_duration",d]);
+        ok=typeOk&&otherOk&&f&&d;
+      }
+      states.push({id:"q17",ok,fields});
+    }
+
+    // Q18 consent
+    {
+      const consent=!!document.getElementById("consent")?.checked;
+      states.push({id:"q18",ok:consent,fields:[["consent",consent]]});
+    }
+
+    return states;
+  }
+
+  function applyQuestionColors(){
+    if(!form.classList.contains("validation-started")) return;
+    getQuestionStates().forEach(s=>{
+      const c=card(s.id);
+      if(!c) return;
+      c.classList.remove("is-answered","is-unanswered","is-invalid");
+      if(s.optional) return;
+      c.classList.add(s.ok ? "is-answered" : "is-unanswered");
+    });
+  }
+
+  function validateSurvey(){
+    form.classList.add("validation-started");
+    clearValidationClasses();
+    form.classList.add("validation-started");
+
+    const states=getQuestionStates();
+
+    // Color every question according to its actual state.
+    states.forEach(s=>{
+      const c=card(s.id);
+      if(!c) return;
+      if(s.optional) return; // Q8 stays white.
+      c.classList.add(s.ok ? "is-answered" : "is-unanswered");
+    });
+
+    // Find the first invalid question.
+    const invalid=states.find(s=>!s.optional&&!s.ok);
+    if(invalid){
+      const c=card(invalid.id);
+      c.classList.remove("is-answered");
+      c.classList.add("is-unanswered","is-invalid");
+
+      invalid.fields.forEach(([name,ok])=>{
+        if(!ok) markBad(name);
+      });
+
+      const err=c.querySelector(".question-error");
+      if(err){
+        if(invalid.id==="q14" && checked("hsct")?.value==="Да"){
+          err.textContent="Моля, попълнете всички подвъпроси за HSCT.";
+        }else{
+          err.textContent="Моля, попълнете всички задължителни полета в този въпрос.";
+        }
+      }
+
+      c.scrollIntoView({behavior:"smooth",block:"center"});
+
+      const firstBad=invalid.fields.find(([name,ok])=>!ok)?.[0];
+      const focus=firstBad
+        ? document.querySelector(`[name="${firstBad}"]`)
+        : c.querySelector("input,select,textarea");
+      if(focus) setTimeout(()=>focus.focus({preventScroll:true}),250);
+
+      return false;
+    }
+    return true;
+  }
+
+  // ---------- UI event wiring ----------
+  document.querySelectorAll('input[name="smoking"]').forEach(el=>el.addEventListener("change",()=>{
+    toggleSmoking();
+    if(form.classList.contains("validation-started")) applyQuestionColors();
+  }));
+  document.querySelectorAll('input[name="alcohol"]').forEach(el=>el.addEventListener("change",()=>{
+    toggleAlcohol();
+    if(form.classList.contains("validation-started")) applyQuestionColors();
+  }));
+  document.querySelectorAll('input[name="alcohol_type"]').forEach(el=>el.addEventListener("change",()=>{
+    toggleAlcoholType();
+    if(form.classList.contains("validation-started")) applyQuestionColors();
+  }));
+  document.querySelectorAll('input[name="diet"]').forEach(el=>el.addEventListener("change",()=>{
+    toggleDetails("diet","dietDetails");
+    if(form.classList.contains("validation-started")) applyQuestionColors();
+  }));
+  document.querySelectorAll('input[name="exercise"]').forEach(el=>el.addEventListener("change",()=>{
+    toggleDetails("exercise","exerciseDetails");
+    if(form.classList.contains("validation-started")) applyQuestionColors();
+  }));
+  document.querySelectorAll('input[name="therapy_status"]').forEach(el=>el.addEventListener("change",()=>{
+    toggleTherapyDetails();
+    if(form.classList.contains("validation-started")) applyQuestionColors();
+  }));
+  document.querySelectorAll('input[name="hsct"]').forEach(el=>el.addEventListener("change",()=>{
+    toggleHsctDetails();
+    if(form.classList.contains("validation-started")) applyQuestionColors();
+  }));
+  document.querySelectorAll('input[name="supplements"]').forEach(el=>el.addEventListener("change",()=>{
+    toggleSupplementDetails();
+    if(form.classList.contains("validation-started")) applyQuestionColors();
+  }));
+  document.querySelectorAll('input[name="supplement_type"]').forEach(el=>el.addEventListener("change",()=>{
+    toggleSupplementDetails();
+    if(form.classList.contains("validation-started")) applyQuestionColors();
+  }));
+
+  form.addEventListener("change",()=>{
+    if(form.classList.contains("validation-started")) applyQuestionColors();
+  });
+  form.addEventListener("input",()=>{
+    if(form.classList.contains("validation-started")) applyQuestionColors();
+  });
+
+  form.addEventListener("submit",async(e)=>{
     e.preventDefault();
     success.style.display="none";
     error.style.display="none";
@@ -937,66 +1086,64 @@
 
     const payload={
       timestamp:new Date().toISOString(),
-      years_ms:document.querySelector('input[name="years_ms"]:checked')?.value||"",
-      age:document.querySelector('input[name="age"]:checked')?.value||"",
-      smoking:document.querySelector('input[name="smoking"]:checked')?.value||"",
-      smoking_since:document.querySelector('input[name="smoking_since"]:checked')?.value||"",
-      smoking_quit_since:document.querySelector('input[name="smoking_quit_since"]:checked')?.value||"",
-      alcohol:document.querySelector('input[name="alcohol"]:checked')?.value||"",
-      alcohol_frequency:document.querySelector('input[name="alcohol_frequency"]:checked')?.value||"",
-      alcohol_type:values("alcohol_type").join(", "),
-      alcohol_weak_amount:document.querySelector('input[name="alcohol_weak_amount"]:checked')?.value||"",
-      alcohol_strong_amount:document.querySelector('input[name="alcohol_strong_amount"]:checked')?.value||"",
-      edss_diagnosis:document.querySelector('input[name="edss_diagnosis"]:checked')?.value||"",
-      edss_current:document.querySelector('input[name="edss_current"]:checked')?.value||"",
-      symptoms:values("symptoms").join(", "),
-      symptoms_other:document.querySelector('input[name="symptoms_other"]')?.value||"",
-      what_helps:document.querySelector('textarea[name="what_helps"]')?.value||"",
-      relapse_12m:document.querySelector('input[name="relapse_12m"]:checked')?.value||"",
-      mri_12m:document.querySelector('input[name="mri_12m"]:checked')?.value||"",
-      walking_aid:document.querySelector('input[name="walking_aid"]:checked')?.value||"",
-      daily_impact:document.querySelector('input[name="daily_impact"]:checked')?.value||"",
-      therapy_status:document.querySelector('input[name="therapy_status"]:checked')?.value||"",
-      therapy_first:values("therapy_first").join(", "),
-      therapy_first_other:document.querySelector('input[name="therapy_first_other"]')?.value||"",
-      therapy_second:values("therapy_second").join(", "),
-      therapy_second_other:document.querySelector('input[name="therapy_second_other"]')?.value||"",
-      therapy_other:document.querySelector('input[name="therapy_other"]')?.value||"",
-      hsct:document.querySelector('input[name="hsct"]:checked')?.value||"",
-      hsct_time:document.querySelector('select[name="hsct_time"]')?.value||"",
-      hsct_edss_before:document.querySelector('input[name="hsct_edss_before"]')?.value||"",
-      hsct_edss_change:document.querySelector('input[name="hsct_edss_change"]:checked')?.value||"",
-      hsct_effects:document.querySelector('textarea[name="hsct_effects"]')?.value||"",
-      supplements:document.querySelector('input[name="supplements"]:checked')?.value||"",
-      supplement_type:values("supplement_type").join(", "),
-      supplements_other:document.querySelector('input[name="supplements_other"]')?.value||"",
-      vitamin_d_dose:document.querySelector('input[name="vitamin_d_dose"]:checked')?.value||"",
-      diet:document.querySelector('input[name="diet"]:checked')?.value||"",
-      diet_type:values("diet_type").join(", "),
-      diet_other:document.querySelector('input[name="diet_other"]')?.value||"",
-      exercise:document.querySelector('input[name="exercise"]:checked')?.value||"",
-      exercise_type:values("exercise_type").join(", "),
-      exercise_other:document.querySelector('input[name="exercise_other"]')?.value||"",
-      exercise_frequency:document.querySelector('input[name="exercise_frequency"]:checked')?.value||"",
-      exercise_duration:document.querySelector('input[name="exercise_duration"]:checked')?.value||"",
+      years_ms:checked("years_ms")?.value||"",
+      age:checked("age")?.value||"",
+      smoking:checked("smoking")?.value||"",
+      smoking_since:checked("smoking_since")?.value||"",
+      smoking_quit_since:checked("smoking_quit_since")?.value||"",
+      alcohol:checked("alcohol")?.value||"",
+      alcohol_frequency:checked("alcohol_frequency")?.value||"",
+      alcohol_type:checkedValues("alcohol_type").join(", "),
+      alcohol_weak_amount:checked("alcohol_weak_amount")?.value||"",
+      alcohol_strong_amount:checked("alcohol_strong_amount")?.value||"",
+      edss_diagnosis:checked("edss_diagnosis")?.value||"",
+      edss_current:checked("edss_current")?.value||"",
+      symptoms:checkedValues("symptoms").join(", "),
+      symptoms_other:document.querySelector('[name="symptoms_other"]')?.value||"",
+      what_helps:document.querySelector('[name="what_helps"]')?.value||"",
+      relapse_12m:checked("relapse_12m")?.value||"",
+      mri_12m:checked("mri_12m")?.value||"",
+      walking_aid:checked("walking_aid")?.value||"",
+      daily_impact:checked("daily_impact")?.value||"",
+      therapy_status:checked("therapy_status")?.value||"",
+      therapy_first:checkedValues("therapy_first").join(", "),
+      therapy_first_other:document.querySelector('[name="therapy_first_other"]')?.value||"",
+      therapy_second:checkedValues("therapy_second").join(", "),
+      therapy_second_other:document.querySelector('[name="therapy_second_other"]')?.value||"",
+      therapy_other:document.querySelector('[name="therapy_other"]')?.value||"",
+      hsct:checked("hsct")?.value||"",
+      hsct_time:document.querySelector('[name="hsct_time"]')?.value||"",
+      hsct_edss_before:document.querySelector('[name="hsct_edss_before"]')?.value||"",
+      hsct_edss_change:checked("hsct_edss_change")?.value||"",
+      hsct_effects:document.querySelector('[name="hsct_effects"]')?.value||"",
+      supplements:checked("supplements")?.value||"",
+      supplement_type:checkedValues("supplement_type").join(", "),
+      supplements_other:document.querySelector('[name="supplements_other"]')?.value||"",
+      vitamin_d_dose:checked("vitamin_d_dose")?.value||"",
+      diet:checked("diet")?.value||"",
+      diet_type:checkedValues("diet_type").join(", "),
+      diet_other:document.querySelector('[name="diet_other"]')?.value||"",
+      exercise:checked("exercise")?.value||"",
+      exercise_type:checkedValues("exercise_type").join(", "),
+      exercise_other:document.querySelector('[name="exercise_other"]')?.value||"",
+      exercise_frequency:checked("exercise_frequency")?.value||"",
+      exercise_duration:checked("exercise_duration")?.value||"",
       consent:document.getElementById("consent")?.checked?"Да":"Не"
     };
 
     try{
-      await fetch(SCRIPT_URL,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(payload)});
+      await fetch(SCRIPT_URL,{
+        method:"POST",
+        mode:"no-cors",
+        headers:{"Content-Type":"text/plain;charset=utf-8"},
+        body:JSON.stringify(payload)
+      });
+
       form.reset();
       form.classList.remove("validation-started");
-      toggleSmoking();
-      toggleAlcohol();
-      document.getElementById("alcoholWeakDetails").classList.add("hidden");
-      document.getElementById("alcoholStrongDetails").classList.add("hidden");
-      toggleDetails("diet","dietDetails");
-      toggleDetails("exercise","exerciseDetails");
-      toggleTherapyDetails();
-      toggleHsctDetails();
-      toggleSupplementDetails();
-      document.querySelectorAll(".card").forEach(c=>c.classList.remove("is-invalid","is-answered","is-unanswered"));
-      document.querySelectorAll(".field-invalid").forEach(el=>el.classList.remove("field-invalid"));
+      refreshUI();
+      clearValidationClasses();
+
       success.textContent="Благодарим Ви! Отговорите са изпратени успешно.";
       success.style.display="block";
       window.scrollTo({top:document.body.scrollHeight,behavior:"smooth"});
@@ -1010,13 +1157,8 @@
     }
   });
 
-  toggleSmoking();
-  toggleAlcohol();
-  toggleDetails("diet","dietDetails");
-  toggleDetails("exercise","exerciseDetails");
-  toggleTherapyDetails();
-  toggleHsctDetails();
-  toggleSupplementDetails();
+  // Initial state: no validation colors.
+  refreshUI();
 
 </script>
 </body>
