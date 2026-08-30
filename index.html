@@ -481,7 +481,14 @@
           </div>
           <div>
             <p class="help">EDSS преди HSCT</p>
-            <input type="text" name="hsct_edss_before" placeholder="Напр. 3.5">
+            <input
+              type="text"
+              name="hsct_edss_before"
+              inputmode="decimal"
+              autocomplete="off"
+              placeholder="Напр. 3.5 или 3,5"
+              title="Въведете само цифри и една запетая или точка като десетичен разделител."
+            >
           </div>
         </div>
         <p class="help" style="margin-top:14px">Как се промени EDSS след HSCT, според Вас / последната Ви оценка?</p>
@@ -659,6 +666,13 @@
   function selected(name){
     const el = document.querySelector(`select[name="${name}"]`);
     return !!el && String(el.value || "").trim() !== "";
+  }
+
+  function validEdssInput(name){
+    const el=document.querySelector(`[name="${name}"]`);
+    if(!el) return false;
+    const value=String(el.value||"").trim();
+    return /^\d+(?:[.,]\d+)?$/.test(value);
   }
 
   function card(id){
@@ -885,7 +899,7 @@
       const fields = [["hsct",!!v]];
       if (v === "Да"){
         const a=selected("hsct_time");
-        const b=filled("hsct_edss_before");
+        const b=validEdssInput("hsct_edss_before");
         const c=!!checked("hsct_edss_change");
         const d=filled("hsct_effects");
         fields.push(["hsct_time",a],["hsct_edss_before",b],["hsct_edss_change",c],["hsct_effects",d]);
@@ -1000,7 +1014,11 @@
       const err=c.querySelector(".question-error");
       if(err){
         if(invalid.id==="q14" && checked("hsct")?.value==="Да"){
-          err.textContent="Моля, попълнете всички подвъпроси за HSCT.";
+          if (filled("hsct_edss_before") && !validEdssInput("hsct_edss_before")){
+            err.textContent="EDSS преди HSCT трябва да съдържа само цифри и една запетая или точка като десетичен разделител.";
+          } else {
+            err.textContent="Моля, попълнете всички задължителни подвъпроси за HSCT.";
+          }
         }else{
           err.textContent="Моля, попълнете всички задължителни полета в този въпрос.";
         }
@@ -1056,6 +1074,21 @@
     toggleSupplementDetails();
     if(form.classList.contains("validation-started")) applyQuestionColors();
   }));
+
+  document.querySelectorAll('input[name="hsct_edss_before"]').forEach(el=>{
+    el.addEventListener("input",()=>{
+      let v=el.value.replace(/[^0-9.,]/g,"");
+      const dot=v.indexOf(".");
+      const comma=v.indexOf(",");
+      let idx=-1;
+      if(dot!==-1 && comma!==-1) idx=Math.min(dot,comma);
+      else if(dot!==-1) idx=dot;
+      else if(comma!==-1) idx=comma;
+      if(idx!==-1) v=v.slice(0,idx+1)+v.slice(idx+1).replace(/[.,]/g,"");
+      if(el.value!==v) el.value=v;
+      if(form.classList.contains("validation-started")) updateQuestionColors();
+    });
+  });
 
   form.addEventListener("change",()=>{
     if(form.classList.contains("validation-started")) applyQuestionColors();
