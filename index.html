@@ -153,6 +153,16 @@
         <label class="option"><input type="radio" name="smoking" value="Да" required><span>Да</span></label>
         <label class="option"><input type="radio" name="smoking" value="Не"><span>Не</span></label>
       </div>
+      <div id="smokingDetails" class="subquestion hidden">
+        <p class="q-title" style="font-size:16px">Ако сте отговорили „Да“ – от кога пушите?</p>
+        <div class="options">
+          <label class="option"><input type="radio" name="smoking_since" value="Под 1 година"><span>Под 1 година</span></label>
+          <label class="option"><input type="radio" name="smoking_since" value="До 2 години"><span>До 2 години</span></label>
+          <label class="option"><input type="radio" name="smoking_since" value="Между 3–10 години"><span>Между 3–10 години</span></label>
+          <label class="option"><input type="radio" name="smoking_since" value="Между 11–20 години"><span>Между 11–20 години</span></label>
+          <label class="option"><input type="radio" name="smoking_since" value="Над 20 години"><span>Над 20 години</span></label>
+        </div>
+      </div>
     </div>
 
     <div class="card">
@@ -160,6 +170,20 @@
       <div class="options">
         <label class="option"><input type="radio" name="alcohol" value="Да" required><span>Да</span></label>
         <label class="option"><input type="radio" name="alcohol" value="Не"><span>Не</span></label>
+      </div>
+      <div id="alcoholDetails" class="subquestion hidden">
+        <p class="q-title" style="font-size:16px">Ако сте отговорили „Да“ – по колко на ден обикновено?</p>
+        <p class="help">Изберете категория според вида, количеството и честотата на употреба.</p>
+        <div class="options">
+          <label class="option"><input type="radio" name="alcohol_amount" value="Слабоалкохолни – до 500 мл – ежедневно"><span>Слабоалкохолни – до 500 мл – ежедневно</span></label>
+          <label class="option"><input type="radio" name="alcohol_amount" value="Слабоалкохолни – до 500 мл – 2–3 пъти седмично"><span>Слабоалкохолни – до 500 мл – 2–3 пъти седмично</span></label>
+          <label class="option"><input type="radio" name="alcohol_amount" value="Слабоалкохолни – до 500 мл – рядко (около 1 път месечно)"><span>Слабоалкохолни – до 500 мл – рядко (около 1 път месечно)</span></label>
+          <label class="option"><input type="radio" name="alcohol_amount" value="Слабоалкохолни – до 500 мл – много рядко (на 3–6 месеца)"><span>Слабоалкохолни – до 500 мл – много рядко (на 3–6 месеца)</span></label>
+          <label class="option"><input type="radio" name="alcohol_amount" value="Силноалкохолни – до 50 мл – ежедневно"><span>Силноалкохолни – до 50 мл – ежедневно</span></label>
+          <label class="option"><input type="radio" name="alcohol_amount" value="Силноалкохолни – до 50 мл – 2–3 пъти седмично"><span>Силноалкохолни – до 50 мл – 2–3 пъти седмично</span></label>
+          <label class="option"><input type="radio" name="alcohol_amount" value="Силноалкохолни – до 50 мл – рядко (около 1 път месечно)"><span>Силноалкохолни – до 50 мл – рядко (около 1 път месечно)</span></label>
+          <label class="option"><input type="radio" name="alcohol_amount" value="Силноалкохолни – до 50 мл – много рядко (на 3–6 месеца)"><span>Силноалкохолни – до 50 мл – много рядко (на 3–6 месеца)</span></label>
+        </div>
       </div>
     </div>
 
@@ -485,6 +509,12 @@
     box.classList.toggle("hidden", !selected || selected.value !== "Да");
   }
 
+  document.querySelectorAll('input[name="smoking"]').forEach(el =>
+    el.addEventListener("change", () => toggleDetails("smoking","smokingDetails"))
+  );
+  document.querySelectorAll('input[name="alcohol"]').forEach(el =>
+    el.addEventListener("change", () => toggleDetails("alcohol","alcoholDetails"))
+  );
   document.querySelectorAll('input[name="diet"]').forEach(el =>
     el.addEventListener("change", () => toggleDetails("diet","dietDetails"))
   );
@@ -542,7 +572,9 @@
       years_ms: document.querySelector('input[name="years_ms"]:checked')?.value || "",
       age: document.querySelector('input[name="age"]:checked')?.value || "",
       smoking: document.querySelector('input[name="smoking"]:checked')?.value || "",
+      smoking_since: document.querySelector('input[name="smoking_since"]:checked')?.value || "",
       alcohol: document.querySelector('input[name="alcohol"]:checked')?.value || "",
+      alcohol_amount: document.querySelector('input[name="alcohol_amount"]:checked')?.value || "",
       edss_diagnosis: document.querySelector('input[name="edss_diagnosis"]:checked')?.value || "",
       edss_current: document.querySelector('input[name="edss_current"]:checked')?.value || "",
       diet: document.querySelector('input[name="diet"]:checked')?.value || "",
@@ -586,6 +618,8 @@
         body: JSON.stringify(payload)
       });
       form.reset();
+      toggleDetails("smoking","smokingDetails");
+      toggleDetails("alcohol","alcoholDetails");
       toggleDetails("diet","dietDetails");
       toggleDetails("exercise","exerciseDetails");
       toggleTherapyDetails();
