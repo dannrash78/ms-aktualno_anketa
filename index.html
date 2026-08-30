@@ -204,6 +204,15 @@
           <label class="option"><input type="radio" name="smoking_since" value="Между 11–20 години"><span>Между 11–20 години</span></label>
           <label class="option"><input type="radio" name="smoking_since" value="Над 20 години"><span>Над 20 години</span></label>
         </div>
+
+        <div class="subquestion" style="margin-top:18px">
+          <p class="q-title" style="font-size:16px">Колко цигари пушите?</p>
+          <div class="options">
+            <label class="option"><input type="radio" name="smoking_amount" value="До една кутия на 2–3 дни"><span>До една кутия на 2–3 дни</span></label>
+            <label class="option"><input type="radio" name="smoking_amount" value="До една кутия дневно"><span>До една кутия дневно</span></label>
+            <label class="option"><input type="radio" name="smoking_amount" value="Над една кутия дневно"><span>Над една кутия дневно</span></label>
+          </div>
+        </div>
       </div>
 
       <div id="smokingQuitDetails" class="subquestion hidden">
@@ -801,9 +810,10 @@
       let ok = !!v;
       const fields = [["smoking", !!v]];
       if (v === "Да"){
-        const sub = !!checked("smoking_since");
-        fields.push(["smoking_since", sub]);
-        ok = sub;
+        const sinceOk = !!checked("smoking_since");
+        const amountOk = !!checked("smoking_amount");
+        fields.push(["smoking_since", sinceOk],["smoking_amount", amountOk]);
+        ok = sinceOk && amountOk;
       } else if (v === "Отказах ги"){
         const sub = !!checked("smoking_quit_since");
         fields.push(["smoking_quit_since", sub]);
@@ -1039,9 +1049,20 @@
 
   // ---------- UI event wiring ----------
   document.querySelectorAll('input[name="smoking"]').forEach(el=>el.addEventListener("change",()=>{
-    toggleSmoking();
+    const details=document.getElementById("smokingDetails");
+    const quitDetails=document.getElementById("smokingQuitDetails");
+    details.classList.toggle("hidden",el.value!=="Да");
+    quitDetails.classList.toggle("hidden",el.value!=="Отказах ги");
+
+    if(el.value!=="Да"){
+      document.querySelectorAll('input[name="smoking_since"],input[name="smoking_amount"]').forEach(x=>x.checked=false);
+    }
+    if(el.value!=="Отказах ги"){
+      document.querySelectorAll('input[name="smoking_quit_since"]').forEach(x=>x.checked=false);
+    }
     if(form.classList.contains("validation-started")) applyQuestionColors();
   }));
+
   document.querySelectorAll('input[name="alcohol"]').forEach(el=>el.addEventListener("change",()=>{
     toggleAlcohol();
     if(form.classList.contains("validation-started")) applyQuestionColors();
@@ -1123,6 +1144,7 @@
       age:checked("age")?.value||"",
       smoking:checked("smoking")?.value||"",
       smoking_since:checked("smoking_since")?.value||"",
+      smoking_amount:checked("smoking_amount")?.value||"",
       smoking_quit_since:checked("smoking_quit_since")?.value||"",
       alcohol:checked("alcohol")?.value||"",
       alcohol_frequency:checked("alcohol_frequency")?.value||"",
