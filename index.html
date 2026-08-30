@@ -79,6 +79,10 @@
     .hidden{display:none}
     textarea,input[type=text]{width:100%;padding:11px 12px;border:1px solid var(--border);border-radius:10px;font:inherit}
     textarea:focus,input[type=text]:focus{outline:none;border-color:var(--orange);box-shadow:0 0 0 4px var(--focus)}
+    select{width:100%;padding:11px 12px;border:1px solid var(--border);border-radius:10px;font:inherit;background:#fff}
+    select:focus{outline:none;border-color:var(--orange);box-shadow:0 0 0 4px var(--focus)}
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    @media (max-width:600px){.grid2{grid-template-columns:1fr}}
     .actions{display:flex;align-items:center;gap:12px;margin-top:18px}
     button{
       border:0;border-radius:12px;padding:13px 18px;
@@ -194,7 +198,195 @@
     </div>
 
     <div class="card">
-      <p class="q-title">7. Спазвате ли определен хранителен режим / диета? <span class="required">*</span></p>
+      <p class="q-title">7. Какви са основните Ви симптоми в момента? <span class="required">*</span></p>
+      <p class="help">Може да изберете повече от един отговор.</p>
+      <div class="options">
+        <label class="option"><input type="checkbox" name="symptoms" value="Сетивни (изтръпване, нарушена чувствителност)"><span>Сетивни (изтръпване, нарушена чувствителност)</span></label>
+        <label class="option"><input type="checkbox" name="symptoms" value="Моторни – долни крайници / ходене"><span>Моторни – долни крайници / ходене</span></label>
+        <label class="option"><input type="checkbox" name="symptoms" value="Моторни – горни крайници"><span>Моторни – горни крайници</span></label>
+        <label class="option"><input type="checkbox" name="symptoms" value="Умора"><span>Умора</span></label>
+        <label class="option"><input type="checkbox" name="symptoms" value="Нарушено зрение"><span>Нарушено зрение</span></label>
+        <label class="option"><input type="checkbox" name="symptoms" value="Световъртеж / замаяност"><span>Световъртеж / замаяност</span></label>
+        <label class="option"><input type="checkbox" name="symptoms" value="Нарушено равновесие / координация"><span>Нарушено равновесие / координация</span></label>
+        <label class="option"><input type="checkbox" name="symptoms" value="Спастичност / скованост"><span>Спастичност / скованост</span></label>
+        <label class="option"><input type="checkbox" name="symptoms" value="Болка"><span>Болка</span></label>
+        <label class="option"><input type="checkbox" name="symptoms" value="Нарушения на пикочния мехур"><span>Нарушения на пикочния мехур</span></label>
+        <label class="option"><input type="checkbox" name="symptoms" value="Нарушения на червата"><span>Нарушения на червата</span></label>
+        <label class="option"><input type="checkbox" name="symptoms" value="Когнитивни затруднения (памет, концентрация)"><span>Когнитивни затруднения (памет, концентрация)</span></label>
+        <label class="option"><input type="checkbox" name="symptoms" value="Нарушения на настроението / тревожност"><span>Нарушения на настроението / тревожност</span></label>
+        <label class="option"><input type="checkbox" name="symptoms" value="Нарушения на съня"><span>Нарушения на съня</span></label>
+        <label class="option"><input type="checkbox" name="symptoms" value="Проблеми с речта / преглъщането"><span>Проблеми с речта / преглъщането</span></label>
+        <label class="option"><input type="checkbox" name="symptoms" value="Друго"><span>Друго</span></label>
+      </div>
+      <p style="margin-top:12px"><input type="text" name="symptoms_other" placeholder="Ако е „Друго“, опишете (по желание)"></p>
+    </div>
+
+    <div class="card">
+      <p class="q-title">8. Кой/какво най-много Ви помага за облекчаване или контролиране на симптомите?</p>
+      <p class="help">Отворен въпрос. Може да посочите лекарства, рехабилитация, движение, сън, хранене, почивка или друго.</p>
+      <textarea name="what_helps" rows="5" placeholder="Вашият отговор..."></textarea>
+    </div>
+
+    <div class="card">
+      <p class="q-title">9. Имали ли сте пристъп/рецидив през последните 12 месеца?</p>
+      <div class="options">
+        <label class="option"><input type="radio" name="relapse_12m" value="Да"><span>Да</span></label>
+        <label class="option"><input type="radio" name="relapse_12m" value="Не"><span>Не</span></label>
+        <label class="option"><input type="radio" name="relapse_12m" value="Не съм сигурен/сигурна"><span>Не съм сигурен/сигурна</span></label>
+      </div>
+    </div>
+
+    <div class="card">
+      <p class="q-title">10. Правено ли Ви е ЯМР на мозъка и/или гръбначния мозък през последните 12 месеца?</p>
+      <div class="options">
+        <label class="option"><input type="radio" name="mri_12m" value="Да"><span>Да</span></label>
+        <label class="option"><input type="radio" name="mri_12m" value="Не"><span>Не</span></label>
+        <label class="option"><input type="radio" name="mri_12m" value="Не знам / не помня"><span>Не знам / не помня</span></label>
+      </div>
+    </div>
+
+    <div class="card">
+      <p class="q-title">11. Налага ли Ви се да използвате помощно средство за ходене?</p>
+      <div class="options">
+        <label class="option"><input type="radio" name="walking_aid" value="Не"><span>Не</span></label>
+        <label class="option"><input type="radio" name="walking_aid" value="Бастун / щека"><span>Бастун / щека</span></label>
+        <label class="option"><input type="radio" name="walking_aid" value="Проходилка / ролатор"><span>Проходилка / ролатор</span></label>
+        <label class="option"><input type="radio" name="walking_aid" value="Инвалидна количка / скутер"><span>Инвалидна количка / скутер</span></label>
+        <label class="option"><input type="radio" name="walking_aid" value="Друго"><span>Друго</span></label>
+      </div>
+    </div>
+
+    <div class="card">
+      <p class="q-title">12. Как оценявате влиянието на МС върху ежедневието Ви в момента?</p>
+      <div class="options">
+        <label class="option"><input type="radio" name="daily_impact" value="Минимално"><span>Минимално</span></label>
+        <label class="option"><input type="radio" name="daily_impact" value="Леко"><span>Леко</span></label>
+        <label class="option"><input type="radio" name="daily_impact" value="Умерено"><span>Умерено</span></label>
+        <label class="option"><input type="radio" name="daily_impact" value="Значително"><span>Значително</span></label>
+        <label class="option"><input type="radio" name="daily_impact" value="Много значително"><span>Много значително</span></label>
+      </div>
+    </div>
+
+    <div class="card">
+      <p class="q-title">13. На терапия ли сте за МС в момента? <span class="required">*</span></p>
+      <p class="help">Изберете според информацията, с която разполагате; класификацията може да зависи от националните правила.</p>
+      <div class="options">
+        <label class="option"><input type="radio" name="therapy_status" value="Не" required><span>Не</span></label>
+        <label class="option"><input type="radio" name="therapy_status" value="Да – първа линия"><span>Да – първа линия</span></label>
+        <label class="option"><input type="radio" name="therapy_status" value="Да – втора линия"><span>Да – втора линия</span></label>
+        <label class="option"><input type="radio" name="therapy_status" value="Да – друга / не знам към коя линия спада"><span>Да – друга / не знам към коя линия спада</span></label>
+      </div>
+
+      <div id="therapyFirst" class="subquestion hidden">
+        <p class="q-title" style="font-size:16px">Ако сте на първа линия – кой препарат?</p>
+        <p class="help">Може да изберете повече от един отговор, ако сте сменяли терапия.</p>
+        <div class="options">
+          <label class="option"><input type="checkbox" name="therapy_first" value="Интерферон бета-1a"><span>Интерферон бета-1a</span></label>
+          <label class="option"><input type="checkbox" name="therapy_first" value="Интерферон бета-1b"><span>Интерферон бета-1b</span></label>
+          <label class="option"><input type="checkbox" name="therapy_first" value="Пегинтерферон бета-1a"><span>Пегинтерферон бета-1a</span></label>
+          <label class="option"><input type="checkbox" name="therapy_first" value="Глатирамер ацетат"><span>Глатирамер ацетат</span></label>
+          <label class="option"><input type="checkbox" name="therapy_first" value="Терифлуномид"><span>Терифлуномид</span></label>
+          <label class="option"><input type="checkbox" name="therapy_first" value="Диметилфумарат"><span>Диметилфумарат</span></label>
+          <label class="option"><input type="checkbox" name="therapy_first" value="Друго"><span>Друго</span></label>
+        </div>
+        <p style="margin-top:12px"><input type="text" name="therapy_first_other" placeholder="Ако е „Друго“, опишете (по желание)"></p>
+      </div>
+
+      <div id="therapySecond" class="subquestion hidden">
+        <p class="q-title" style="font-size:16px">Ако сте на втора линия – кой препарат?</p>
+        <p class="help">Може да изберете повече от един отговор, ако сте сменяли терапия.</p>
+        <div class="options">
+          <label class="option"><input type="checkbox" name="therapy_second" value="Финголимод"><span>Финголимод</span></label>
+          <label class="option"><input type="checkbox" name="therapy_second" value="Натализумаб"><span>Натализумаб</span></label>
+          <label class="option"><input type="checkbox" name="therapy_second" value="Окрелизумаб"><span>Окрелизумаб</span></label>
+          <label class="option"><input type="checkbox" name="therapy_second" value="Кладрибин"><span>Кладрибин</span></label>
+          <label class="option"><input type="checkbox" name="therapy_second" value="Понесимод"><span>Понесимод</span></label>
+          <label class="option"><input type="checkbox" name="therapy_second" value="Офатумумаб"><span>Офатумумаб</span></label>
+          <label class="option"><input type="checkbox" name="therapy_second" value="Друго"><span>Друго</span></label>
+        </div>
+        <p style="margin-top:12px"><input type="text" name="therapy_second_other" placeholder="Ако е „Друго“, опишете (по желание)"></p>
+      </div>
+
+      <div id="therapyOther" class="subquestion hidden">
+        <p class="q-title" style="font-size:16px">Моля, посочете терапията (по желание).</p>
+        <input type="text" name="therapy_other" placeholder="Наименование на терапията">
+      </div>
+    </div>
+
+    <div class="card">
+      <p class="q-title">14. Имате ли опит с HSCT / автоложна трансплантация на хемопоетични стволови клетки?</p>
+      <div class="options">
+        <label class="option"><input type="radio" name="hsct" value="Не"><span>Не</span></label>
+        <label class="option"><input type="radio" name="hsct" value="Да"><span>Да</span></label>
+        <label class="option"><input type="radio" name="hsct" value="Предстои ми / планирам"><span>Предстои ми / планирам</span></label>
+      </div>
+
+      <div id="hsctDetails" class="subquestion hidden">
+        <p class="q-title" style="font-size:16px">Ако сте преминали HSCT:</p>
+        <div class="grid2">
+          <div>
+            <p class="help">Преди колко време?</p>
+            <select name="hsct_time">
+              <option value="">Изберете...</option>
+              <option>Под 1 година</option>
+              <option>1–2 години</option>
+              <option>3–5 години</option>
+              <option>6–10 години</option>
+              <option>Над 10 години</option>
+            </select>
+          </div>
+          <div>
+            <p class="help">EDSS преди HSCT (по желание)</p>
+            <input type="text" name="hsct_edss_before" placeholder="Напр. 3.5">
+          </div>
+        </div>
+        <p class="help" style="margin-top:14px">Как се промени EDSS след HSCT, според Вас / последната Ви оценка?</p>
+        <div class="options">
+          <label class="option"><input type="radio" name="hsct_edss_change" value="Подобри се"><span>Подобри се</span></label>
+          <label class="option"><input type="radio" name="hsct_edss_change" value="Без съществена промяна"><span>Без съществена промяна</span></label>
+          <label class="option"><input type="radio" name="hsct_edss_change" value="Влоши се"><span>Влоши се</span></label>
+          <label class="option"><input type="radio" name="hsct_edss_change" value="Не знам / не съм проследяван с EDSS"><span>Не знам / не съм проследяван с EDSS</span></label>
+        </div>
+        <p style="margin-top:14px"><textarea name="hsct_effects" rows="4" placeholder="Как Ви повлия HSCT като цяло? (по желание)"></textarea></p>
+      </div>
+    </div>
+
+    <div class="card">
+      <p class="q-title">15. Приемате ли хранителни добавки? <span class="required">*</span></p>
+      <div class="options">
+        <label class="option"><input type="radio" name="supplements" value="Да" required><span>Да</span></label>
+        <label class="option"><input type="radio" name="supplements" value="Не"><span>Не</span></label>
+      </div>
+      <div id="supplementDetails" class="subquestion hidden">
+        <p class="q-title" style="font-size:16px">Какви добавки приемате?</p>
+        <p class="help">Може да изберете повече от един отговор.</p>
+        <div class="options">
+          <label class="option"><input type="checkbox" name="supplement_type" value="Витамин D"><span>Витамин D</span></label>
+          <label class="option"><input type="checkbox" name="supplement_type" value="Витамин B12"><span>Витамин B12</span></label>
+          <label class="option"><input type="checkbox" name="supplement_type" value="Магнезий"><span>Магнезий</span></label>
+          <label class="option"><input type="checkbox" name="supplement_type" value="Омега-3"><span>Омега-3</span></label>
+          <label class="option"><input type="checkbox" name="supplement_type" value="Фолиева киселина"><span>Фолиева киселина</span></label>
+          <label class="option"><input type="checkbox" name="supplement_type" value="Желязо"><span>Желязо</span></label>
+          <label class="option"><input type="checkbox" name="supplement_type" value="Калций"><span>Калций</span></label>
+          <label class="option"><input type="checkbox" name="supplement_type" value="Други"><span>Други</span></label>
+        </div>
+        <p style="margin-top:12px"><input type="text" name="supplement_other" placeholder="Други добавки (по желание)"></p>
+        <div id="vitaminDDetails" class="subquestion hidden">
+          <p class="q-title" style="font-size:16px">Витамин D – каква е дневната Ви доза?</p>
+          <div class="options">
+            <label class="option"><input type="radio" name="vitamin_d_dose" value="Не приемам витамин D"><span>Не приемам витамин D</span></label>
+            <label class="option"><input type="radio" name="vitamin_d_dose" value="400–1000 IU"><span>400–1000 IU</span></label>
+            <label class="option"><input type="radio" name="vitamin_d_dose" value="1000–5000 IU"><span>1000–5000 IU</span></label>
+            <label class="option"><input type="radio" name="vitamin_d_dose" value="5000–10000 IU"><span>5000–10000 IU</span></label>
+            <label class="option"><input type="radio" name="vitamin_d_dose" value="Повече от 10000 IU"><span>Повече от 10000 IU</span></label>
+            <label class="option"><input type="radio" name="vitamin_d_dose" value="Не знам / не съм сигурен/сигурна"><span>Не знам / не съм сигурен/сигурна</span></label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <p class="q-title">16. Спазвате ли определен хранителен режим / диета? <span class="required">*</span></p>
       <div class="options">
         <label class="option"><input type="radio" name="diet" value="Да" required><span>Да</span></label>
         <label class="option"><input type="radio" name="diet" value="Не"><span>Не</span></label>
@@ -216,7 +408,7 @@
     </div>
 
     <div class="card">
-      <p class="q-title">8. Тренирате ли или извършвате ли редовна физическа активност? <span class="required">*</span></p>
+      <p class="q-title">17. Тренирате ли или извършвате ли редовна физическа активност? <span class="required">*</span></p>
       <div class="options">
         <label class="option"><input type="radio" name="exercise" value="Да" required><span>Да</span></label>
         <label class="option"><input type="radio" name="exercise" value="Не"><span>Не</span></label>
@@ -304,6 +496,29 @@
     return [...document.querySelectorAll(`input[name="${name}"]:checked`)].map(x => x.value);
   }
 
+  function toggleSupplementDetails(){
+    const selected = document.querySelector('input[name="supplements"]:checked')?.value || "";
+    document.getElementById("supplementDetails").classList.toggle("hidden", selected !== "Да");
+    const hasVitaminD = [...document.querySelectorAll('input[name="supplement_type"]:checked')].some(x => x.value === "Витамин D");
+    document.getElementById("vitaminDDetails").classList.toggle("hidden", selected !== "Да" || !hasVitaminD);
+  }
+  document.querySelectorAll('input[name="supplements"]').forEach(el => el.addEventListener("change", toggleSupplementDetails));
+  document.querySelectorAll('input[name="supplement_type"]').forEach(el => el.addEventListener("change", toggleSupplementDetails));
+
+  function toggleTherapyDetails(){
+    const selected = document.querySelector('input[name="therapy_status"]:checked')?.value || "";
+    document.getElementById("therapyFirst").classList.toggle("hidden", selected !== "Да – първа линия");
+    document.getElementById("therapySecond").classList.toggle("hidden", selected !== "Да – втора линия");
+    document.getElementById("therapyOther").classList.toggle("hidden", selected !== "Да – друга / не знам към коя линия спада");
+  }
+  document.querySelectorAll('input[name="therapy_status"]').forEach(el => el.addEventListener("change", toggleTherapyDetails));
+
+  function toggleHsctDetails(){
+    const selected = document.querySelector('input[name="hsct"]:checked')?.value || "";
+    document.getElementById("hsctDetails").classList.toggle("hidden", selected !== "Да");
+  }
+  document.querySelectorAll('input[name="hsct"]').forEach(el => el.addEventListener("change", toggleHsctDetails));
+
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
     success.style.display = "none";
@@ -338,6 +553,28 @@
       exercise_other: document.querySelector('input[name="exercise_other"]')?.value || "",
       exercise_frequency: document.querySelector('input[name="exercise_frequency"]:checked')?.value || "",
       exercise_duration: document.querySelector('input[name="exercise_duration"]:checked')?.value || "",
+      symptoms: values("symptoms").join(", "),
+      symptoms_other: document.querySelector('input[name="symptoms_other"]')?.value || "",
+      what_helps: document.querySelector('textarea[name="what_helps"]')?.value || "",
+      relapse_12m: document.querySelector('input[name="relapse_12m"]:checked')?.value || "",
+      mri_12m: document.querySelector('input[name="mri_12m"]:checked')?.value || "",
+      walking_aid: document.querySelector('input[name="walking_aid"]:checked')?.value || "",
+      daily_impact: document.querySelector('input[name="daily_impact"]:checked')?.value || "",
+      therapy_status: document.querySelector('input[name="therapy_status"]:checked')?.value || "",
+      therapy_first: values("therapy_first").join(", "),
+      therapy_first_other: document.querySelector('input[name="therapy_first_other"]')?.value || "",
+      therapy_second: values("therapy_second").join(", "),
+      therapy_second_other: document.querySelector('input[name="therapy_second_other"]')?.value || "",
+      therapy_other: document.querySelector('input[name="therapy_other"]')?.value || "",
+      hsct: document.querySelector('input[name="hsct"]:checked')?.value || "",
+      hsct_time: document.querySelector('select[name="hsct_time"]')?.value || "",
+      hsct_edss_before: document.querySelector('input[name="hsct_edss_before"]')?.value || "",
+      hsct_edss_change: document.querySelector('input[name="hsct_edss_change"]:checked')?.value || "",
+      hsct_effects: document.querySelector('textarea[name="hsct_effects"]')?.value || "",
+      supplements: document.querySelector('input[name="supplements"]:checked')?.value || "",
+      supplement_type: values("supplement_type").join(", "),
+      supplement_other: document.querySelector('input[name="supplement_other"]')?.value || "",
+      vitamin_d_dose: document.querySelector('input[name="vitamin_d_dose"]:checked')?.value || "",
       consent: document.getElementById("consent").checked ? "Да" : "Не"
     };
 
@@ -351,6 +588,9 @@
       form.reset();
       toggleDetails("diet","dietDetails");
       toggleDetails("exercise","exerciseDetails");
+      toggleTherapyDetails();
+      toggleHsctDetails();
+      toggleSupplementDetails();
       success.style.display = "block";
       window.scrollTo({top:document.body.scrollHeight, behavior:"smooth"});
     }catch(err){
