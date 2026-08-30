@@ -1,14 +1,11 @@
 function doPost(e) {
   try {
     var data = JSON.parse(e.postData.contents);
-
     var SPREADSHEET_ID = "1AA-cQk5AywsnkW98ZZOt9ha7vKvGzkxxQKFAUj_a4SQ";
     var SHEET_NAME = "Отговори";
-
     var ss = SpreadsheetApp.openById(SPREADSHEET_ID);
     var sheet = ss.getSheetByName(SHEET_NAME) || ss.insertSheet(SHEET_NAME);
 
-    // This is the complete list of fields currently sent by index.html.
     var headers = [
       "Дата и час",
       "Години с МС",
@@ -54,98 +51,86 @@ function doPost(e) {
       "Физическа активност – друго",
       "Физическа активност – честота",
       "Физическа активност – продължителност",
+      "Психологическа подкрепа – нужда",
+      "Психологическа/психотерапевтична подкрепа – получава ли",
+      "Психологическа подкрепа – вид",
       "Съгласие"
     ];
 
-    // Create/update the header row without deleting existing responses.
     if (sheet.getLastRow() === 0) {
-      sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
+      sheet.getRange(1,1,1,headers.length).setValues([headers]);
     } else {
-      var lastColumn = Math.max(sheet.getLastColumn(), 1);
-      var existingHeaders = sheet.getRange(1, 1, 1, lastColumn).getValues()[0]
-        .map(function(h) { return String(h || "").trim(); });
-
-      var existingSet = {};
-      existingHeaders.forEach(function(h) {
-        if (h) existingSet[h] = true;
-      });
-
-      var missing = headers.filter(function(h) { return !existingSet[h]; });
-
-      if (missing.length) {
-        var startCol = existingHeaders.length + 1;
-        sheet.getRange(1, startCol, 1, missing.length).setValues([missing]);
-        existingHeaders = existingHeaders.concat(missing);
+      var lastColumn=Math.max(sheet.getLastColumn(),1);
+      var existingHeaders=sheet.getRange(1,1,1,lastColumn).getValues()[0].map(function(h){return String(h||"").trim();});
+      var existingSet={};
+      existingHeaders.forEach(function(h){if(h) existingSet[h]=true;});
+      var missing=headers.filter(function(h){return !existingSet[h];});
+      if(missing.length){
+        sheet.getRange(1,existingHeaders.length+1,1,missing.length).setValues([missing]);
       }
     }
 
-    // Build a map from the actual sheet headers to the submitted payload.
-    var lastColumnNow = sheet.getLastColumn();
-    var finalHeaders = sheet.getRange(1, 1, 1, lastColumnNow).getValues()[0]
-      .map(function(h) { return String(h || "").trim(); });
-
-    var labelToKey = {
-      "Дата и час": "timestamp",
-      "Години с МС": "years_ms",
-      "Възраст": "age",
-      "Пушене": "smoking",
-      "Пушене – от колко години": "smoking_since",
-      "Пушене – количество": "smoking_amount",
-      "Пушене – отказване преди": "smoking_quit_since",
-      "Алкохол": "alcohol",
-      "Алкохол – честота": "alcohol_frequency",
-      "Алкохол – вид": "alcohol_type",
-      "Слабоалкохолни – количество": "alcohol_weak_amount",
-      "Силноалкохолни – количество": "alcohol_strong_amount",
-      "EDSS при диагностициране": "edss_diagnosis",
-      "EDSS в момента": "edss_current",
-      "Основни симптоми": "symptoms",
-      "Симптоми – друго": "symptoms_other",
-      "Какво помага за симптомите": "what_helps",
-      "Пристъп/рецидив през последните 12 месеца": "relapse_12m",
-      "ЯМР през последните 12 месеца": "mri_12m",
-      "Помощно средство за ходене": "walking_aid",
-      "Влияние на МС върху ежедневието": "daily_impact",
-      "Терапия за МС": "therapy_status",
-      "Терапия – първа линия": "therapy_first",
-      "Терапия – първа линия – друго": "therapy_first_other",
-      "Терапия – втора линия": "therapy_second",
-      "Терапия – втора линия – друго": "therapy_second_other",
-      "Терапия – друго": "therapy_other",
-      "HSCT": "hsct",
-      "HSCT – преди колко време": "hsct_time",
-      "EDSS преди HSCT": "hsct_edss_before",
-      "EDSS след HSCT": "hsct_edss_change",
-      "Как повлия HSCT като цяло": "hsct_effects",
-      "Хранителни добавки": "supplements",
-      "Видове хранителни добавки": "supplement_type",
-      "Добавки – друго": "supplements_other",
-      "Витамин D – дневна доза": "vitamin_d_dose",
-      "Диета/хранителен режим": "diet",
-      "Вид диета": "diet_type",
-      "Диета – друго": "diet_other",
-      "Физическа активност": "exercise",
-      "Вид физическа активност": "exercise_type",
-      "Физическа активност – друго": "exercise_other",
-      "Физическа активност – честота": "exercise_frequency",
-      "Физическа активност – продължителност": "exercise_duration",
-      "Съгласие": "consent"
-    };
-
-    var row = finalHeaders.map(function(header) {
-      var key = labelToKey[header];
-      return key && data[key] !== undefined ? data[key] : "";
+    var finalHeaders=sheet.getRange(1,1,1,sheet.getLastColumn()).getValues()[0].map(function(h){return String(h||"").trim();});
+    var labelToKey={
+  "Дата и час": "timestamp",
+  "Години с МС": "years_ms",
+  "Възраст": "age",
+  "Пушене": "smoking",
+  "Пушене – от колко години": "smoking_since",
+  "Пушене – количество": "smoking_amount",
+  "Пушене – отказване преди": "smoking_quit_since",
+  "Алкохол": "alcohol",
+  "Алкохол – честота": "alcohol_frequency",
+  "Алкохол – вид": "alcohol_type",
+  "Слабоалкохолни – количество": "alcohol_weak_amount",
+  "Силноалкохолни – количество": "alcohol_strong_amount",
+  "EDSS при диагностициране": "edss_diagnosis",
+  "EDSS в момента": "edss_current",
+  "Основни симптоми": "symptoms",
+  "Симптоми – друго": "symptoms_other",
+  "Какво помага за симптомите": "what_helps",
+  "Пристъп/рецидив през последните 12 месеца": "relapse_12m",
+  "ЯМР през последните 12 месеца": "mri_12m",
+  "Помощно средство за ходене": "walking_aid",
+  "Влияние на МС върху ежедневието": "daily_impact",
+  "Терапия за МС": "therapy_status",
+  "Терапия – първа линия": "therapy_first",
+  "Терапия – първа линия – друго": "therapy_first_other",
+  "Терапия – втора линия": "therapy_second",
+  "Терапия – втора линия – друго": "therapy_second_other",
+  "Терапия – друго": "therapy_other",
+  "HSCT": "hsct",
+  "HSCT – преди колко време": "hsct_time",
+  "EDSS преди HSCT": "hsct_edss_before",
+  "EDSS след HSCT": "hsct_edss_change",
+  "Как повлия HSCT като цяло": "hsct_effects",
+  "Хранителни добавки": "supplements",
+  "Видове хранителни добавки": "supplement_type",
+  "Добавки – друго": "supplements_other",
+  "Витамин D – дневна доза": "vitamin_d_dose",
+  "Диета/хранителен режим": "diet",
+  "Вид диета": "diet_type",
+  "Диета – друго": "diet_other",
+  "Физическа активност": "exercise",
+  "Вид физическа активност": "exercise_type",
+  "Физическа активност – друго": "exercise_other",
+  "Физическа активност – честота": "exercise_frequency",
+  "Физическа активност – продължителност": "exercise_duration",
+  "Психологическа подкрепа – нужда": "psych_need",
+  "Психологическа/психотерапевтична подкрепа – получава ли": "psych_support",
+  "Психологическа подкрепа – вид": "psych_type",
+  "Съгласие": "consent"
+};
+    var row=finalHeaders.map(function(header){
+      var key=labelToKey[header];
+      return key && data[key]!==undefined ? data[key] : "";
     });
+    sheet.getRange(sheet.getLastRow()+1,1,1,row.length).setValues([row]);
 
-    sheet.getRange(sheet.getLastRow() + 1, 1, 1, row.length).setValues([row]);
-
-    return ContentService
-      .createTextOutput(JSON.stringify({ok:true}))
+    return ContentService.createTextOutput(JSON.stringify({ok:true}))
       .setMimeType(ContentService.MimeType.JSON);
-
-  } catch (err) {
-    return ContentService
-      .createTextOutput(JSON.stringify({ok:false, error:String(err)}))
+  } catch(err) {
+    return ContentService.createTextOutput(JSON.stringify({ok:false,error:String(err)}))
       .setMimeType(ContentService.MimeType.JSON);
   }
 }

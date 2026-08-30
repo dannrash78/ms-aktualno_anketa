@@ -628,6 +628,33 @@
     
 
     <div class="card" id="q18" data-question-card="q18">
+      <p class="q-title">18. Имате ли нужда от психологическа подкрепа? <span class="required">*</span></p>
+      <div class="options">
+        <label class="option"><input type="radio" name="psych_need" value="Да"><span>Да</span></label>
+        <label class="option"><input type="radio" name="psych_need" value="Не"><span>Не</span></label>
+      </div>
+
+      <div id="psychDetails" class="subquestion hidden">
+        <p class="q-title" style="font-size:16px">Получавате ли в момента психологическа / психотерапевтична подкрепа? <span class="required">*</span></p>
+        <div class="options">
+          <label class="option"><input type="radio" name="psych_support" value="Да"><span>Да</span></label>
+          <label class="option"><input type="radio" name="psych_support" value="Не"><span>Не</span></label>
+        </div>
+
+        <div id="psychTypeDetails" class="subquestion hidden">
+          <p class="q-title" style="font-size:16px">Какъв вид подкрепа получавате? <span class="required">*</span></p>
+          <div class="options">
+            <label class="option"><input type="checkbox" name="psych_type" value="Персонална психотерапия"><span>Персонална психотерапия</span></label>
+            <label class="option"><input type="checkbox" name="psych_type" value="Групова психотерапия"><span>Групова психотерапия</span></label>
+            <label class="option"><input type="checkbox" name="psych_type" value="И двете"><span>И двете</span></label>
+          </div>
+        </div>
+      </div>
+
+      <div class="question-error">Моля, отговорете на този въпрос.</div>
+    </div>
+
+    <div class="card" id="q19" data-question-card="q19">
       <label class="option" style="border:0;padding:0">
         <input type="checkbox" id="consent">
         <span>Потвърждавам, че участвам доброволно и съм съгласен/съгласна отговорите ми да бъдат използвани за обобщен анализ. <span class="required">*</span></span>
@@ -975,10 +1002,34 @@
       states.push({id:"q17",ok,fields});
     }
 
-    // Q18 consent
+    // Q18 psychological support
+    {
+      const need = checked("psych_need")?.value || "";
+      let ok = !!need;
+      const fields = [["psych_need", !!need]];
+
+      if (need === "Да"){
+        const support = checked("psych_support")?.value || "";
+        const supportOk = !!support;
+        fields.push(["psych_support", supportOk]);
+
+        if (support === "Да"){
+          const types = checkedValues("psych_type");
+          const typeOk = types.length > 0;
+          fields.push(["psych_type", typeOk]);
+          ok = supportOk && typeOk;
+        } else {
+          ok = supportOk;
+        }
+      }
+
+      states.push({id:"q18",ok,fields});
+    }
+
+    // Q19 consent
     {
       const consent=!!document.getElementById("consent")?.checked;
-      states.push({id:"q18",ok:consent,fields:[["consent",consent]]});
+      states.push({id:"q19",ok:consent,fields:[["consent",consent]]});
     }
 
     return states;
@@ -1095,6 +1146,35 @@
     toggleSupplementDetails();
     if(form.classList.contains("validation-started")) applyQuestionColors();
   }));
+  document.querySelectorAll('input[name="psych_need"]').forEach(el=>el.addEventListener("change",()=>{
+    const details=document.getElementById("psychDetails");
+    const typeDetails=document.getElementById("psychTypeDetails");
+    details.classList.toggle("hidden",el.value!=="Да");
+    if(el.value!=="Да"){
+      document.querySelectorAll('input[name="psych_support"],input[name="psych_type"]').forEach(x=>x.checked=false);
+      typeDetails.classList.add("hidden");
+    }
+    if(form.classList.contains("validation-started")) applyQuestionColors();
+  }));
+
+  document.querySelectorAll('input[name="psych_support"]').forEach(el=>el.addEventListener("change",()=>{
+    const typeDetails=document.getElementById("psychTypeDetails");
+    typeDetails.classList.toggle("hidden",el.value!=="Да");
+    if(el.value!=="Да") document.querySelectorAll('input[name="psych_type"]').forEach(x=>x.checked=false);
+    if(form.classList.contains("validation-started")) applyQuestionColors();
+  }));
+
+  document.querySelectorAll('input[name="psych_type"]').forEach(el=>el.addEventListener("change",()=>{
+    if(el.value==="И двете" && el.checked){
+      document.querySelectorAll('input[name="psych_type"]:not([value="И двете"])').forEach(x=>x.checked=false);
+    } else if(el.value!=="И двете" && el.checked){
+      const both=document.querySelector('input[name="psych_type"][value="И двете"]');
+      if(both) both.checked=false;
+    }
+    if(form.classList.contains("validation-started")) applyQuestionColors();
+  }));
+
+
 
   document.querySelectorAll('input[name="hsct_edss_before"]').forEach(el=>{
     el.addEventListener("input",()=>{
@@ -1183,6 +1263,9 @@
       exercise_other:document.querySelector('[name="exercise_other"]')?.value||"",
       exercise_frequency:checked("exercise_frequency")?.value||"",
       exercise_duration:checked("exercise_duration")?.value||"",
+      psych_need:checked("psych_need")?.value||"",
+      psych_support:checked("psych_support")?.value||"",
+      psych_type:checkedValues("psych_type").join(", "),
       consent:document.getElementById("consent")?.checked?"Да":"Не"
     };
 
