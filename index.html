@@ -192,8 +192,10 @@
       <p class="q-title">3. Пушите ли? <span class="required">*</span></p>
       <div class="options">
         <label class="option"><input type="radio" name="smoking" value="Да"><span>Да</span></label>
-        <label class="option"><input type="radio" name="smoking" value="Не"><span>Не</span></label>
+        <label class="option"><input type="radio" name="smoking" value="Отказах ги"><span>Отказах ги</span></label>
+        <label class="option"><input type="radio" name="smoking" value="Никога не съм пушил/а"><span>Никога не съм пушил/а</span></label>
       </div>
+
       <div id="smokingDetails" class="subquestion hidden">
         <p class="q-title" style="font-size:16px">Ако сте отговорили „Да“ – от кога пушите?</p>
         <div class="options">
@@ -204,7 +206,17 @@
           <label class="option"><input type="radio" name="smoking_since" value="Над 20 години"><span>Над 20 години</span></label>
         </div>
       </div>
-    
+
+      <div id="smokingQuitDetails" class="subquestion hidden">
+        <p class="q-title" style="font-size:16px">Ако сте отговорили „Отказах ги“ – преди колко време ги отказахте?</p>
+        <div class="options">
+          <label class="option"><input type="radio" name="smoking_quit_since" value="Преди 1 година"><span>Преди 1 година</span></label>
+          <label class="option"><input type="radio" name="smoking_quit_since" value="Преди 2–5 години"><span>Преди 2–5 години</span></label>
+          <label class="option"><input type="radio" name="smoking_quit_since" value="Преди 5–10 години"><span>Преди 5–10 години</span></label>
+          <label class="option"><input type="radio" name="smoking_quit_since" value="Преди над 10 години"><span>Преди над 10 години</span></label>
+        </div>
+      </div>
+
       <div class="question-error">Моля, отговорете на този въпрос.</div>
     </div>
 
@@ -678,7 +690,10 @@
     states.push({card:q("q2"), ok:groupChecked("age")});
 
     const smoking = document.querySelector('input[name="smoking"]:checked')?.value;
-    states.push({card:q("q3"), ok:!!smoking && (smoking !== "Да" || groupChecked("smoking_since"))});
+    let smokingOk = !!smoking;
+    if (smoking === "Да") smokingOk = groupChecked("smoking_since");
+    if (smoking === "Отказах ги") smokingOk = groupChecked("smoking_quit_since");
+    states.push({card:q("q3"), ok:smokingOk});
 
     const alcohol = document.querySelector('input[name="alcohol"]:checked')?.value;
     let alcoholOk = !!alcohol;
@@ -818,9 +833,18 @@
     if (vd) vd.classList.toggle("hidden", !vitaminD);
   }
 
-  document.querySelectorAll('input[name="smoking"]').forEach(el => el.addEventListener("change", () => {
-    toggleDetails("smoking","smokingDetails");
-    if (el.value === "Не") document.querySelectorAll('input[name="smoking_since"]').forEach(x => x.checked=false);
+  document.querySelectorAll('input[name="smoking"]').forEach(el=>el.addEventListener("change",()=>{
+    const details=document.getElementById("smokingDetails");
+    const quitDetails=document.getElementById("smokingQuitDetails");
+    details.classList.toggle("hidden",el.value!=="Да");
+    quitDetails.classList.toggle("hidden",el.value!=="Отказах ги");
+
+    if(el.value!=="Да") {
+      document.querySelectorAll('input[name="smoking_since"]').forEach(x=>x.checked=false);
+    }
+    if(el.value!=="Отказах ги") {
+      document.querySelectorAll('input[name="smoking_quit_since"]').forEach(x=>x.checked=false);
+    }
   }));
 
   document.querySelectorAll('input[name="alcohol"]').forEach(el => el.addEventListener("change", () => {
@@ -888,6 +912,7 @@
       age:document.querySelector('input[name="age"]:checked')?.value||"",
       smoking:document.querySelector('input[name="smoking"]:checked')?.value||"",
       smoking_since:document.querySelector('input[name="smoking_since"]:checked')?.value||"",
+      smoking_quit_since:document.querySelector('input[name="smoking_quit_since"]:checked')?.value||"",
       alcohol:document.querySelector('input[name="alcohol"]:checked')?.value||"",
       alcohol_frequency:document.querySelector('input[name="alcohol_frequency"]:checked')?.value||"",
       alcohol_type:values("alcohol_type").join(", "),

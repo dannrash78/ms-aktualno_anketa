@@ -6,7 +6,8 @@ function doPost(e) {
     var ss = SpreadsheetApp.openById(SPREADSHEET_ID);
     var sheet = ss.getSheetByName(SHEET_NAME) || ss.insertSheet(SHEET_NAME);
     var headers = [
-      "timestamp","years_ms","age","smoking","smoking_since","alcohol","alcohol_amount","edss_diagnosis","edss_current",
+      "timestamp","years_ms","age","smoking","smoking_since",
+      "smoking_quit_since","alcohol","alcohol_amount","edss_diagnosis","edss_current",
       "symptoms","symptoms_other","what_helps","relapse_12m","mri_12m","walking_aid","daily_impact",
       "therapy_status","therapy_first","therapy_first_other","therapy_second","therapy_second_other","therapy_other",
       "hsct","hsct_time","hsct_edss_before","hsct_edss_change","hsct_effects",
