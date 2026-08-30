@@ -54,7 +54,32 @@
       padding:22px;
       margin:14px 0;
       box-shadow:0 5px 18px rgba(16,45,84,.05);
+      transition:background .2s ease,border-color .2s ease,box-shadow .2s ease;
     }
+    .card.is-answered{
+      background:#effaf2;
+      border-color:#b9dfc2;
+    }
+    .card.is-invalid{
+      background:#fff1f1;
+      border-color:#efb8b8;
+      box-shadow:0 7px 22px rgba(190,50,50,.08);
+    }
+    .card.is-invalid:target{scroll-margin-top:18px}
+    .subquestion.is-invalid{
+      background:#fff1f1;
+      border-radius:10px;
+      padding:12px 12px 12px 14px;
+      margin-top:14px;
+    }
+    .question-error{
+      display:none;
+      margin:10px 0 0;
+      color:#a12828;
+      font-size:13px;
+      font-weight:700;
+    }
+    .card.is-invalid .question-error{display:block}
     .q-title{
       font-weight:700;
       font-size:18px;
@@ -123,34 +148,43 @@
   </div>
 
   <form id="surveyForm" novalidate>
-    <div class="card">
+    <form id="surveyForm" novalidate>
+    <div class="card" id="q1" data-question-card="q1">
       <p class="q-title">1. От колко време сте диагностицирани с множествена склероза (МС)? <span class="required">*</span></p>
       <div class="options">
-        <label class="option"><input type="radio" name="years_ms" value="Под 1 година" required><span>Под 1 година</span></label>
+        <label class="option"><input type="radio" name="years_ms" value="Под 1 година"><span>Под 1 година</span></label>
         <label class="option"><input type="radio" name="years_ms" value="1–2 години"><span>1–2 години</span></label>
         <label class="option"><input type="radio" name="years_ms" value="3–5 години"><span>3–5 години</span></label>
         <label class="option"><input type="radio" name="years_ms" value="6–10 години"><span>6–10 години</span></label>
         <label class="option"><input type="radio" name="years_ms" value="11–20 години"><span>11–20 години</span></label>
         <label class="option"><input type="radio" name="years_ms" value="Над 20 години"><span>Над 20 години</span></label>
       </div>
+    
+      <div class="question-error">Моля, отговорете на този въпрос.</div>
     </div>
 
-    <div class="card">
+    
+
+    <div class="card" id="q2" data-question-card="q2">
       <p class="q-title">2. На каква възраст сте? <span class="required">*</span></p>
       <div class="options">
-        <label class="option"><input type="radio" name="age" value="Под 20 г." required><span>Под 20 г.</span></label>
+        <label class="option"><input type="radio" name="age" value="Под 20 г."><span>Под 20 г.</span></label>
         <label class="option"><input type="radio" name="age" value="20–29 г."><span>20–29 г.</span></label>
         <label class="option"><input type="radio" name="age" value="30–39 г."><span>30–39 г.</span></label>
         <label class="option"><input type="radio" name="age" value="40–49 г."><span>40–49 г.</span></label>
         <label class="option"><input type="radio" name="age" value="50–59 г."><span>50–59 г.</span></label>
         <label class="option"><input type="radio" name="age" value="60+ г."><span>60+ г.</span></label>
       </div>
+    
+      <div class="question-error">Моля, отговорете на този въпрос.</div>
     </div>
 
-    <div class="card">
+    
+
+    <div class="card" id="q3" data-question-card="q3">
       <p class="q-title">3. Пушите ли? <span class="required">*</span></p>
       <div class="options">
-        <label class="option"><input type="radio" name="smoking" value="Да" required><span>Да</span></label>
+        <label class="option"><input type="radio" name="smoking" value="Да"><span>Да</span></label>
         <label class="option"><input type="radio" name="smoking" value="Не"><span>Не</span></label>
       </div>
       <div id="smokingDetails" class="subquestion hidden">
@@ -163,12 +197,16 @@
           <label class="option"><input type="radio" name="smoking_since" value="Над 20 години"><span>Над 20 години</span></label>
         </div>
       </div>
+    
+      <div class="question-error">Моля, отговорете на този въпрос.</div>
     </div>
 
-    <div class="card">
+    
+
+    <div class="card" id="q4" data-question-card="q4">
       <p class="q-title">4. Употребявате ли алкохол? <span class="required">*</span></p>
       <div class="options">
-        <label class="option"><input type="radio" name="alcohol" value="Да" required><span>Да</span></label>
+        <label class="option"><input type="radio" name="alcohol" value="Да"><span>Да</span></label>
         <label class="option"><input type="radio" name="alcohol" value="Не"><span>Не</span></label>
       </div>
 
@@ -209,10 +247,14 @@
           </div>
         </div>
       </div>
+    
+      <div class="question-error">Моля, отговорете на този въпрос.</div>
     </div>
 
-    <div class="card">
-      <p class="q-title">5. Какъв беше Вашият EDSS при диагностицирането на МС?</p>
+    
+
+    <div class="card" id="q5" data-question-card="q5">
+      <p class="q-title">5. Какъв беше Вашият EDSS при диагностицирането на МС? <span class="required">*</span></p>
       <div class="options">
         <label class="option"><input type="radio" name="edss_diagnosis" value="0"><span>0</span></label>
         <label class="option"><input type="radio" name="edss_diagnosis" value="1.0–1.5"><span>1.0–1.5</span></label>
@@ -226,10 +268,14 @@
         <label class="option"><input type="radio" name="edss_diagnosis" value="9.0–9.5"><span>9.0–9.5</span></label>
         <label class="option"><input type="radio" name="edss_diagnosis" value="Не знам / не ми е известно"><span>Не знам / не ми е известно</span></label>
       </div>
+    
+      <div class="question-error">Моля, отговорете на този въпрос.</div>
     </div>
 
-    <div class="card">
-      <p class="q-title">6. Какъв е Вашият EDSS в момента?</p>
+    
+
+    <div class="card" id="q6" data-question-card="q6">
+      <p class="q-title">6. Какъв е Вашият EDSS в момента? <span class="required">*</span></p>
       <div class="options">
         <label class="option"><input type="radio" name="edss_current" value="0"><span>0</span></label>
         <label class="option"><input type="radio" name="edss_current" value="1.0–1.5"><span>1.0–1.5</span></label>
@@ -243,9 +289,13 @@
         <label class="option"><input type="radio" name="edss_current" value="9.0–9.5"><span>9.0–9.5</span></label>
         <label class="option"><input type="radio" name="edss_current" value="Не знам / не ми е измерван"><span>Не знам / не ми е измерван</span></label>
       </div>
+    
+      <div class="question-error">Моля, отговорете на този въпрос.</div>
     </div>
 
-    <div class="card">
+    
+
+    <div class="card" id="q7" data-question-card="q7">
       <p class="q-title">7. Какви са основните Ви симптоми в момента? <span class="required">*</span></p>
       <p class="help">Може да изберете повече от един отговор.</p>
       <div class="options">
@@ -267,34 +317,50 @@
         <label class="option"><input type="checkbox" name="symptoms" value="Друго"><span>Друго</span></label>
       </div>
       <p style="margin-top:12px"><input type="text" name="symptoms_other" placeholder="Ако е „Друго“, опишете (по желание)"></p>
+    
+      <div class="question-error">Моля, отговорете на този въпрос.</div>
     </div>
 
-    <div class="card">
+    
+
+    <div class="card" id="q8" data-question-card="q8">
       <p class="q-title">8. Кой/какво най-много Ви помага за облекчаване или контролиране на симптомите?</p>
       <p class="help">Отворен въпрос. Може да посочите лекарства, рехабилитация, движение, сън, хранене, почивка или друго.</p>
       <textarea name="what_helps" rows="5" placeholder="Вашият отговор..."></textarea>
+    
+      <div class="question-error">Моля, отговорете на този въпрос.</div>
     </div>
 
-    <div class="card">
-      <p class="q-title">9. Имали ли сте пристъп/рецидив през последните 12 месеца?</p>
+    
+
+    <div class="card" id="q9" data-question-card="q9">
+      <p class="q-title">9. Имали ли сте пристъп/рецидив през последните 12 месеца? <span class="required">*</span></p>
       <div class="options">
         <label class="option"><input type="radio" name="relapse_12m" value="Да"><span>Да</span></label>
         <label class="option"><input type="radio" name="relapse_12m" value="Не"><span>Не</span></label>
         <label class="option"><input type="radio" name="relapse_12m" value="Не съм сигурен/сигурна"><span>Не съм сигурен/сигурна</span></label>
       </div>
+    
+      <div class="question-error">Моля, отговорете на този въпрос.</div>
     </div>
 
-    <div class="card">
-      <p class="q-title">10. Правено ли Ви е ЯМР на мозъка и/или гръбначния мозък през последните 12 месеца?</p>
+    
+
+    <div class="card" id="q10" data-question-card="q10">
+      <p class="q-title">10. Правено ли Ви е ЯМР на мозъка и/или гръбначния мозък през последните 12 месеца? <span class="required">*</span></p>
       <div class="options">
         <label class="option"><input type="radio" name="mri_12m" value="Да"><span>Да</span></label>
         <label class="option"><input type="radio" name="mri_12m" value="Не"><span>Не</span></label>
         <label class="option"><input type="radio" name="mri_12m" value="Не знам / не помня"><span>Не знам / не помня</span></label>
       </div>
+    
+      <div class="question-error">Моля, отговорете на този въпрос.</div>
     </div>
 
-    <div class="card">
-      <p class="q-title">11. Налага ли Ви се да използвате помощно средство за ходене?</p>
+    
+
+    <div class="card" id="q11" data-question-card="q11">
+      <p class="q-title">11. Налага ли Ви се да използвате помощно средство за ходене? <span class="required">*</span></p>
       <div class="options">
         <label class="option"><input type="radio" name="walking_aid" value="Не"><span>Не</span></label>
         <label class="option"><input type="radio" name="walking_aid" value="Бастун / щека"><span>Бастун / щека</span></label>
@@ -302,10 +368,14 @@
         <label class="option"><input type="radio" name="walking_aid" value="Инвалидна количка / скутер"><span>Инвалидна количка / скутер</span></label>
         <label class="option"><input type="radio" name="walking_aid" value="Друго"><span>Друго</span></label>
       </div>
+    
+      <div class="question-error">Моля, отговорете на този въпрос.</div>
     </div>
 
-    <div class="card">
-      <p class="q-title">12. Как оценявате влиянието на МС върху ежедневието Ви в момента?</p>
+    
+
+    <div class="card" id="q12" data-question-card="q12">
+      <p class="q-title">12. Как оценявате влиянието на МС върху ежедневието Ви в момента? <span class="required">*</span></p>
       <div class="options">
         <label class="option"><input type="radio" name="daily_impact" value="Минимално"><span>Минимално</span></label>
         <label class="option"><input type="radio" name="daily_impact" value="Леко"><span>Леко</span></label>
@@ -313,13 +383,17 @@
         <label class="option"><input type="radio" name="daily_impact" value="Значително"><span>Значително</span></label>
         <label class="option"><input type="radio" name="daily_impact" value="Много значително"><span>Много значително</span></label>
       </div>
+    
+      <div class="question-error">Моля, отговорете на този въпрос.</div>
     </div>
 
-    <div class="card">
+    
+
+    <div class="card" id="q13" data-question-card="q13">
       <p class="q-title">13. На терапия ли сте за МС в момента? <span class="required">*</span></p>
       <p class="help">Изберете според информацията, с която разполагате; класификацията може да зависи от националните правила.</p>
       <div class="options">
-        <label class="option"><input type="radio" name="therapy_status" value="Не" required><span>Не</span></label>
+        <label class="option"><input type="radio" name="therapy_status" value="Не"><span>Не</span></label>
         <label class="option"><input type="radio" name="therapy_status" value="Да – първа линия"><span>Да – първа линия</span></label>
         <label class="option"><input type="radio" name="therapy_status" value="Да – втора линия"><span>Да – втора линия</span></label>
         <label class="option"><input type="radio" name="therapy_status" value="Да – друга / не знам към коя линия спада"><span>Да – друга / не знам към коя линия спада</span></label>
@@ -359,10 +433,14 @@
         <p class="q-title" style="font-size:16px">Моля, посочете терапията (по желание).</p>
         <input type="text" name="therapy_other" placeholder="Наименование на терапията">
       </div>
+    
+      <div class="question-error">Моля, отговорете на този въпрос.</div>
     </div>
 
-    <div class="card">
-      <p class="q-title">14. Имате ли опит с HSCT / автоложна трансплантация на хемопоетични стволови клетки?</p>
+    
+
+    <div class="card" id="q14" data-question-card="q14">
+      <p class="q-title">14. Имате ли опит с HSCT / автоложна трансплантация на хемопоетични стволови клетки? <span class="required">*</span></p>
       <div class="options">
         <label class="option"><input type="radio" name="hsct" value="Не"><span>Не</span></label>
         <label class="option"><input type="radio" name="hsct" value="Да"><span>Да</span></label>
@@ -384,7 +462,7 @@
             </select>
           </div>
           <div>
-            <p class="help">EDSS преди HSCT (по желание)</p>
+            <p class="help">EDSS преди HSCT</p>
             <input type="text" name="hsct_edss_before" placeholder="Напр. 3.5">
           </div>
         </div>
@@ -395,14 +473,18 @@
           <label class="option"><input type="radio" name="hsct_edss_change" value="Влоши се"><span>Влоши се</span></label>
           <label class="option"><input type="radio" name="hsct_edss_change" value="Не знам / не съм проследяван с EDSS"><span>Не знам / не съм проследяван с EDSS</span></label>
         </div>
-        <p style="margin-top:14px"><textarea name="hsct_effects" rows="4" placeholder="Как Ви повлия HSCT като цяло? (по желание)"></textarea></p>
+        <p style="margin-top:14px"><textarea name="hsct_effects" rows="4" placeholder="Как Ви повлия HSCT като цяло?"></textarea></p>
       </div>
+    
+      <div class="question-error">Моля, отговорете на този въпрос.</div>
     </div>
 
-    <div class="card">
+    
+
+    <div class="card" id="q15" data-question-card="q15">
       <p class="q-title">15. Приемате ли хранителни добавки? <span class="required">*</span></p>
       <div class="options">
-        <label class="option"><input type="radio" name="supplements" value="Да" required><span>Да</span></label>
+        <label class="option"><input type="radio" name="supplements" value="Да"><span>Да</span></label>
         <label class="option"><input type="radio" name="supplements" value="Не"><span>Не</span></label>
       </div>
       <div id="supplementDetails" class="subquestion hidden">
@@ -431,12 +513,16 @@
           </div>
         </div>
       </div>
+    
+      <div class="question-error">Моля, отговорете на този въпрос.</div>
     </div>
 
-    <div class="card">
+    
+
+    <div class="card" id="q16" data-question-card="q16">
       <p class="q-title">16. Спазвате ли определен хранителен режим / диета? <span class="required">*</span></p>
       <div class="options">
-        <label class="option"><input type="radio" name="diet" value="Да" required><span>Да</span></label>
+        <label class="option"><input type="radio" name="diet" value="Да"><span>Да</span></label>
         <label class="option"><input type="radio" name="diet" value="Не"><span>Не</span></label>
       </div>
       <div id="dietDetails" class="subquestion hidden">
@@ -453,12 +539,16 @@
         </div>
         <p style="margin-top:12px"><input type="text" name="diet_other" placeholder="Ако е „Друга“, опишете (по желание)"></p>
       </div>
+    
+      <div class="question-error">Моля, отговорете на този въпрос.</div>
     </div>
 
-    <div class="card">
+    
+
+    <div class="card" id="q17" data-question-card="q17">
       <p class="q-title">17. Тренирате ли или извършвате ли редовна физическа активност? <span class="required">*</span></p>
       <div class="options">
-        <label class="option"><input type="radio" name="exercise" value="Да" required><span>Да</span></label>
+        <label class="option"><input type="radio" name="exercise" value="Да"><span>Да</span></label>
         <label class="option"><input type="radio" name="exercise" value="Не"><span>Не</span></label>
       </div>
       <div id="exerciseDetails" class="subquestion hidden">
@@ -497,13 +587,19 @@
           </div>
         </div>
       </div>
+    
+      <div class="question-error">Моля, отговорете на този въпрос.</div>
     </div>
 
-    <div class="card">
+    
+
+    <div class="card" id="q18" data-question-card="q18">
       <label class="option" style="border:0;padding:0">
-        <input type="checkbox" id="consent" required>
+        <input type="checkbox" id="consent">
         <span>Потвърждавам, че участвам доброволно и съм съгласен/съгласна отговорите ми да бъдат използвани за обобщен анализ. <span class="required">*</span></span>
       </label>
+    
+      <div class="question-error">Моля, отговорете на този въпрос.</div>
     </div>
 
     <div class="actions">
@@ -533,154 +629,293 @@
     box.classList.toggle("hidden", !selected || selected.value !== "Да");
   }
 
-  document.querySelectorAll('input[name="smoking"]').forEach(el =>
-    el.addEventListener("change", () => toggleDetails("smoking","smokingDetails"))
-  );
-  document.querySelectorAll('input[name="alcohol"]').forEach(el =>
-    el.addEventListener("change", () => {
-      toggleDetails("alcohol","alcoholDetails");
-      if (el.checked && el.value === "Не") {
-        document.querySelectorAll('input[name="alcohol_type"], input[name="alcohol_weak_amount"], input[name="alcohol_strong_amount"], input[name="alcohol_frequency"]').forEach(x => x.checked = false);
-        document.getElementById("alcoholWeakDetails").classList.add("hidden");
-        document.getElementById("alcoholStrongDetails").classList.add("hidden");
-      }
-    })
-  );
-  document.querySelectorAll('input[name="alcohol_type"]').forEach(el =>
-    el.addEventListener("change", () => {
-      const weak = document.querySelector('input[name="alcohol_type"][value="Слабоалкохолни"]')?.checked;
-      const strong = document.querySelector('input[name="alcohol_type"][value="Силноалкохолни"]')?.checked;
-      document.getElementById("alcoholWeakDetails").classList.toggle("hidden", !weak);
-      document.getElementById("alcoholStrongDetails").classList.toggle("hidden", !strong);
-      if (!weak) document.querySelectorAll('input[name="alcohol_weak_amount"]').forEach(x => x.checked = false);
-      if (!strong) document.querySelectorAll('input[name="alcohol_strong_amount"]').forEach(x => x.checked = false);
-    })
-  );
-  document.querySelectorAll('input[name="diet"]').forEach(el =>
-    el.addEventListener("change", () => toggleDetails("diet","dietDetails"))
-  );
-  document.querySelectorAll('input[name="exercise"]').forEach(el =>
-    el.addEventListener("change", () => toggleDetails("exercise","exerciseDetails"))
-  );
-
   function values(name){
     return [...document.querySelectorAll(`input[name="${name}"]:checked`)].map(x => x.value);
   }
 
-  function toggleSupplementDetails(){
-    const selected = document.querySelector('input[name="supplements"]:checked')?.value || "";
-    document.getElementById("supplementDetails").classList.toggle("hidden", selected !== "Да");
-    const hasVitaminD = [...document.querySelectorAll('input[name="supplement_type"]:checked')].some(x => x.value === "Витамин D");
-    document.getElementById("vitaminDDetails").classList.toggle("hidden", selected !== "Да" || !hasVitaminD);
+  function setCardState(card, ok){
+    if (!card) return;
+    card.classList.toggle("is-invalid", !ok);
+    card.classList.toggle("is-answered", ok);
   }
-  document.querySelectorAll('input[name="supplements"]').forEach(el => el.addEventListener("change", toggleSupplementDetails));
-  document.querySelectorAll('input[name="supplement_type"]').forEach(el => el.addEventListener("change", toggleSupplementDetails));
+
+  function groupChecked(name){
+    return document.querySelectorAll(`input[name="${name}"]:checked`).length > 0;
+  }
+
+  function textFilled(name){
+    const el=document.querySelector(`[name="${name}"]`);
+    return !!el && !!el.value.trim();
+  }
+
+  function visibleSelectFilled(name){
+    const el=document.querySelector(`select[name="${name}"]`);
+    return !!el && !el.closest(".hidden") && !!el.value;
+  }
+
+  function validateSurvey(){
+    const checks=[];
+    const q=id=>document.getElementById(id);
+
+    checks.push({card:q("q1"), ok:groupChecked("years_ms")});
+    checks.push({card:q("q2"), ok:groupChecked("age")});
+
+    const smoking=document.querySelector('input[name="smoking"]:checked')?.value;
+    const smokingOk=!!smoking && (smoking!=="Да" || groupChecked("smoking_since"));
+    checks.push({card:q("q3"), ok:smokingOk});
+
+    const alcohol=document.querySelector('input[name="alcohol"]:checked')?.value;
+    let alcoholOk=!!alcohol;
+    if(alcohol==="Да"){
+      const freq=groupChecked("alcohol_frequency");
+      const type=groupChecked("alcohol_type");
+      const weak=document.querySelector('input[name="alcohol_type"][value="Слабоалкохолни"]')?.checked;
+      const strong=document.querySelector('input[name="alcohol_type"][value="Силноалкохолни"]')?.checked;
+      const weakOk=!weak || groupChecked("alcohol_weak_amount");
+      const strongOk=!strong || groupChecked("alcohol_strong_amount");
+      alcoholOk=freq && type && weakOk && strongOk;
+    }
+    checks.push({card:q("q4"), ok:alcoholOk});
+
+    checks.push({card:q("q5"), ok:groupChecked("edss_diagnosis")});
+    checks.push({card:q("q6"), ok:groupChecked("edss_current")});
+
+    const symptomList=groupChecked("symptoms");
+    const otherSymptom=document.querySelector('input[name="symptoms"][value="Друго"]')?.checked;
+    const symptomsOk=symptomList && (!otherSymptom || textFilled("symptoms_other"));
+    checks.push({card:q("q7"), ok:symptomsOk});
+
+    // Q8 intentionally optional.
+    checks.push({card:q("q8"), ok:true});
+
+    checks.push({card:q("q9"), ok:groupChecked("relapse_12m")});
+    checks.push({card:q("q10"), ok:groupChecked("mri_12m")});
+    checks.push({card:q("q11"), ok:groupChecked("walking_aid")});
+    checks.push({card:q("q12"), ok:groupChecked("daily_impact")});
+
+    const therapyStatus=document.querySelector('input[name="therapy_status"]:checked')?.value;
+    let therapyOk=!!therapyStatus;
+    if(therapyStatus==="Да – първа линия"){
+      const has=groupChecked("therapy_first");
+      const other=document.querySelector('input[name="therapy_first"][value="Друго"]')?.checked;
+      therapyOk=has && (!other || textFilled("therapy_first_other"));
+    }
+    if(therapyStatus==="Да – втора линия"){
+      const has=groupChecked("therapy_second");
+      const other=document.querySelector('input[name="therapy_second"][value="Друго"]')?.checked;
+      therapyOk=has && (!other || textFilled("therapy_second_other"));
+    }
+    if(therapyStatus==="Да – друга / не знам към коя линия спада"){
+      therapyOk=textFilled("therapy_other");
+    }
+    checks.push({card:q("q13"), ok:therapyOk});
+
+    const hsct=document.querySelector('input[name="hsct"]:checked')?.value;
+    let hsctOk=!!hsct;
+    if(hsct==="Да"){
+      hsctOk =
+        visibleSelectFilled("hsct_time") &&
+        textFilled("hsct_edss_before") &&
+        groupChecked("hsct_edss_change") &&
+        textFilled("hsct_effects");
+    }
+    checks.push({card:q("q14"), ok:hsctOk});
+
+    const supplements=document.querySelector('input[name="supplements"]:checked')?.value;
+    let supplementsOk=!!supplements;
+    if(supplements==="Да"){
+      const hasType=groupChecked("supplement_type");
+      const vitaminD=document.querySelector('input[name="supplement_type"][value="Витамин D"]')?.checked;
+      supplementsOk=hasType && (!vitaminD || groupChecked("vitamin_d_dose"));
+      const other=document.querySelector('input[name="supplement_type"][value="Други"]')?.checked;
+      supplementsOk=supplementsOk && (!other || textFilled("supplements_other"));
+    }
+    checks.push({card:q("q15"), ok:supplementsOk});
+
+    const diet=document.querySelector('input[name="diet"]:checked')?.value;
+    let dietOk=!!diet;
+    if(diet==="Да"){
+      const has=groupChecked("diet_type");
+      const other=document.querySelector('input[name="diet_type"][value="Друга"]')?.checked;
+      dietOk=has && (!other || textFilled("diet_other"));
+    }
+    checks.push({card:q("q16"), ok:dietOk});
+
+    const exercise=document.querySelector('input[name="exercise"]:checked')?.value;
+    let exerciseOk=!!exercise;
+    if(exercise==="Да"){
+      const hasType=groupChecked("exercise_type");
+      const other=document.querySelector('input[name="exercise_type"][value="Друго"]')?.checked;
+      const otherSport=document.querySelector('input[name="exercise_type"][value="Друг спорт"]')?.checked;
+      const otherTextOk=!other || textFilled("exercise_other");
+      exerciseOk=hasType && otherTextOk && groupChecked("exercise_frequency") && groupChecked("exercise_duration");
+    }
+    checks.push({card:q("q17"), ok:exerciseOk});
+
+    const consent=document.getElementById("consent");
+    const consentCard=consent?.closest(".card") || q("q18");
+    checks.push({card:consentCard, ok:!!consent?.checked});
+
+    checks.forEach(c => setCardState(c.card,c.ok));
+
+    const invalid=checks.find(c=>!c.ok);
+    if(invalid){
+      invalid.card.scrollIntoView({behavior:"smooth",block:"center"});
+      const focusable=invalid.card.querySelector('input:not([type="hidden"]), select, textarea');
+      if(focusable){
+        setTimeout(()=>focusable.focus({preventScroll:true}),300);
+      }
+      return false;
+    }
+    return true;
+  }
+
+  function refreshConditionalSections(){
+    toggleDetails("smoking","smokingDetails");
+    toggleDetails("alcohol","alcoholDetails");
+    toggleDetails("diet","dietDetails");
+    toggleDetails("exercise","exerciseDetails");
+    toggleTherapyDetails();
+    toggleHsctDetails();
+    toggleSupplementDetails();
+  }
 
   function toggleTherapyDetails(){
-    const selected = document.querySelector('input[name="therapy_status"]:checked')?.value || "";
-    document.getElementById("therapyFirst").classList.toggle("hidden", selected !== "Да – първа линия");
-    document.getElementById("therapySecond").classList.toggle("hidden", selected !== "Да – втора линия");
-    document.getElementById("therapyOther").classList.toggle("hidden", selected !== "Да – друга / не знам към коя линия спада");
+    const selected=document.querySelector('input[name="therapy_status"]:checked')?.value || "";
+    document.getElementById("therapyFirst").classList.toggle("hidden",selected!=="Да – първа линия");
+    document.getElementById("therapySecond").classList.toggle("hidden",selected!=="Да – втора линия");
+    document.getElementById("therapyOther").classList.toggle("hidden",!selected.startsWith("Да – друга"));
   }
-  document.querySelectorAll('input[name="therapy_status"]').forEach(el => el.addEventListener("change", toggleTherapyDetails));
 
   function toggleHsctDetails(){
-    const selected = document.querySelector('input[name="hsct"]:checked')?.value || "";
-    document.getElementById("hsctDetails").classList.toggle("hidden", selected !== "Да");
+    const selected=document.querySelector('input[name="hsct"]:checked')?.value || "";
+    document.getElementById("hsctDetails").classList.toggle("hidden",selected!=="Да");
   }
-  document.querySelectorAll('input[name="hsct"]').forEach(el => el.addEventListener("change", toggleHsctDetails));
 
-  form.addEventListener("submit", async (e) => {
+  function toggleSupplementDetails(){
+    const selected=document.querySelector('input[name="supplements"]:checked')?.value || "";
+    document.getElementById("supplementDetails").classList.toggle("hidden",selected!=="Да");
+    const vitaminD=document.querySelector('input[name="supplement_type"][value="Витамин D"]')?.checked;
+    if(document.getElementById("vitaminDDetails")){
+      document.getElementById("vitaminDDetails").classList.toggle("hidden",!vitaminD);
+    }
+  }
+
+  document.querySelectorAll('input[name="smoking"]').forEach(el=>el.addEventListener("change",()=>toggleDetails("smoking","smokingDetails")));
+  document.querySelectorAll('input[name="alcohol"]').forEach(el=>el.addEventListener("change",()=>{
+    toggleDetails("alcohol","alcoholDetails");
+    if(el.value==="Не"){
+      document.querySelectorAll('input[name="alcohol_frequency"],input[name="alcohol_type"],input[name="alcohol_weak_amount"],input[name="alcohol_strong_amount"]').forEach(x=>x.checked=false);
+      document.getElementById("alcoholWeakDetails").classList.add("hidden");
+      document.getElementById("alcoholStrongDetails").classList.add("hidden");
+    }
+  }));
+  document.querySelectorAll('input[name="alcohol_type"]').forEach(el=>el.addEventListener("change",()=>{
+    const weak=document.querySelector('input[name="alcohol_type"][value="Слабоалкохолни"]')?.checked;
+    const strong=document.querySelector('input[name="alcohol_type"][value="Силноалкохолни"]')?.checked;
+    document.getElementById("alcoholWeakDetails").classList.toggle("hidden",!weak);
+    document.getElementById("alcoholStrongDetails").classList.toggle("hidden",!strong);
+    if(!weak) document.querySelectorAll('input[name="alcohol_weak_amount"]').forEach(x=>x.checked=false);
+    if(!strong) document.querySelectorAll('input[name="alcohol_strong_amount"]').forEach(x=>x.checked=false);
+  }));
+  document.querySelectorAll('input[name="diet"]').forEach(el=>el.addEventListener("change",()=>toggleDetails("diet","dietDetails")));
+  document.querySelectorAll('input[name="exercise"]').forEach(el=>el.addEventListener("change",()=>toggleDetails("exercise","exerciseDetails")));
+  document.querySelectorAll('input[name="therapy_status"]').forEach(el=>el.addEventListener("change",toggleTherapyDetails));
+  document.querySelectorAll('input[name="hsct"]').forEach(el=>el.addEventListener("change",toggleHsctDetails));
+
+  // Supplements (supports the earlier questionnaire structure).
+  document.querySelectorAll('input[name="supplements"]').forEach(el=>el.addEventListener("change",toggleSupplementDetails));
+  document.querySelectorAll('input[name="supplement_type"]').forEach(el=>el.addEventListener("change",toggleSupplementDetails));
+
+  form.addEventListener("change",()=>{
+    const card=form.querySelector(".card:focus-within");
+    if(card && card.classList.contains("is-invalid")) validateSurvey();
+  });
+
+  form.addEventListener("submit",async(e)=>{
     e.preventDefault();
-    success.style.display = "none";
-    error.style.display = "none";
+    success.style.display="none";
+    error.style.display="none";
 
-    if (!form.checkValidity()){
-      form.reportValidity();
-      return;
-    }
-    if (SCRIPT_URL.includes("PASTE_GOOGLE")){
-      error.textContent = "Анкетата още не е свързана с Google Sheets. Организаторът трябва да постави URL адреса на Google Apps Script.";
-      error.style.display = "block";
+    if(!validateSurvey()){
+      error.textContent="Моля, попълнете всички задължителни въпроси. Преместих Ви към първия непопълнен въпрос.";
+      error.style.display="block";
       return;
     }
 
-    submitBtn.disabled = true;
-    submitBtn.textContent = "Изпращане…";
+    if(SCRIPT_URL.includes("PASTE_GOOGLE")){
+      error.textContent="Анкетата още не е свързана с Google Sheets. Организаторът трябва да постави URL адреса на Google Apps Script.";
+      error.style.display="block";
+      return;
+    }
 
-    const payload = {
-      timestamp: new Date().toISOString(),
-      years_ms: document.querySelector('input[name="years_ms"]:checked')?.value || "",
-      age: document.querySelector('input[name="age"]:checked')?.value || "",
-      smoking: document.querySelector('input[name="smoking"]:checked')?.value || "",
-      smoking_since: document.querySelector('input[name="smoking_since"]:checked')?.value || "",
-      alcohol: document.querySelector('input[name="alcohol"]:checked')?.value || "",
-      alcohol_frequency: document.querySelector('input[name="alcohol_frequency"]:checked')?.value || "",
-      alcohol_type: values("alcohol_type").join(", "),
-      alcohol_weak_amount: document.querySelector('input[name="alcohol_weak_amount"]:checked')?.value || "",
-      alcohol_strong_amount: document.querySelector('input[name="alcohol_strong_amount"]:checked')?.value || "",
-      edss_diagnosis: document.querySelector('input[name="edss_diagnosis"]:checked')?.value || "",
-      edss_current: document.querySelector('input[name="edss_current"]:checked')?.value || "",
-      diet: document.querySelector('input[name="diet"]:checked')?.value || "",
-      diet_type: values("diet_type").join(", "),
-      diet_other: document.querySelector('input[name="diet_other"]')?.value || "",
-      exercise: document.querySelector('input[name="exercise"]:checked')?.value || "",
-      exercise_type: values("exercise_type").join(", "),
-      exercise_other: document.querySelector('input[name="exercise_other"]')?.value || "",
-      exercise_frequency: document.querySelector('input[name="exercise_frequency"]:checked')?.value || "",
-      exercise_duration: document.querySelector('input[name="exercise_duration"]:checked')?.value || "",
-      symptoms: values("symptoms").join(", "),
-      symptoms_other: document.querySelector('input[name="symptoms_other"]')?.value || "",
-      what_helps: document.querySelector('textarea[name="what_helps"]')?.value || "",
-      relapse_12m: document.querySelector('input[name="relapse_12m"]:checked')?.value || "",
-      mri_12m: document.querySelector('input[name="mri_12m"]:checked')?.value || "",
-      walking_aid: document.querySelector('input[name="walking_aid"]:checked')?.value || "",
-      daily_impact: document.querySelector('input[name="daily_impact"]:checked')?.value || "",
-      therapy_status: document.querySelector('input[name="therapy_status"]:checked')?.value || "",
-      therapy_first: values("therapy_first").join(", "),
-      therapy_first_other: document.querySelector('input[name="therapy_first_other"]')?.value || "",
-      therapy_second: values("therapy_second").join(", "),
-      therapy_second_other: document.querySelector('input[name="therapy_second_other"]')?.value || "",
-      therapy_other: document.querySelector('input[name="therapy_other"]')?.value || "",
-      hsct: document.querySelector('input[name="hsct"]:checked')?.value || "",
-      hsct_time: document.querySelector('select[name="hsct_time"]')?.value || "",
-      hsct_edss_before: document.querySelector('input[name="hsct_edss_before"]')?.value || "",
-      hsct_edss_change: document.querySelector('input[name="hsct_edss_change"]:checked')?.value || "",
-      hsct_effects: document.querySelector('textarea[name="hsct_effects"]')?.value || "",
-      supplements: document.querySelector('input[name="supplements"]:checked')?.value || "",
-      supplement_type: values("supplement_type").join(", "),
-      supplement_other: document.querySelector('input[name="supplement_other"]')?.value || "",
-      vitamin_d_dose: document.querySelector('input[name="vitamin_d_dose"]:checked')?.value || "",
-      consent: document.getElementById("consent").checked ? "Да" : "Не"
+    submitBtn.disabled=true;
+    submitBtn.textContent="Изпращане…";
+
+    const payload={
+      timestamp:new Date().toISOString(),
+      years_ms:document.querySelector('input[name="years_ms"]:checked')?.value||"",
+      age:document.querySelector('input[name="age"]:checked')?.value||"",
+      smoking:document.querySelector('input[name="smoking"]:checked')?.value||"",
+      smoking_since:document.querySelector('input[name="smoking_since"]:checked')?.value||"",
+      alcohol:document.querySelector('input[name="alcohol"]:checked')?.value||"",
+      alcohol_frequency:document.querySelector('input[name="alcohol_frequency"]:checked')?.value||"",
+      alcohol_type:values("alcohol_type").join(", "),
+      alcohol_weak_amount:document.querySelector('input[name="alcohol_weak_amount"]:checked')?.value||"",
+      alcohol_strong_amount:document.querySelector('input[name="alcohol_strong_amount"]:checked')?.value||"",
+      edss_diagnosis:document.querySelector('input[name="edss_diagnosis"]:checked')?.value||"",
+      edss_current:document.querySelector('input[name="edss_current"]:checked')?.value||"",
+      symptoms:values("symptoms").join(", "),
+      symptoms_other:document.querySelector('input[name="symptoms_other"]')?.value||"",
+      what_helps:document.querySelector('textarea[name="what_helps"]')?.value||"",
+      relapse_12m:document.querySelector('input[name="relapse_12m"]:checked')?.value||"",
+      mri_12m:document.querySelector('input[name="mri_12m"]:checked')?.value||"",
+      walking_aid:document.querySelector('input[name="walking_aid"]:checked')?.value||"",
+      daily_impact:document.querySelector('input[name="daily_impact"]:checked')?.value||"",
+      therapy_status:document.querySelector('input[name="therapy_status"]:checked')?.value||"",
+      therapy_first:values("therapy_first").join(", "),
+      therapy_first_other:document.querySelector('input[name="therapy_first_other"]')?.value||"",
+      therapy_second:values("therapy_second").join(", "),
+      therapy_second_other:document.querySelector('input[name="therapy_second_other"]')?.value||"",
+      therapy_other:document.querySelector('input[name="therapy_other"]')?.value||"",
+      hsct:document.querySelector('input[name="hsct"]:checked')?.value||"",
+      hsct_time:document.querySelector('select[name="hsct_time"]')?.value||"",
+      hsct_edss_before:document.querySelector('input[name="hsct_edss_before"]')?.value||"",
+      hsct_edss_change:document.querySelector('input[name="hsct_edss_change"]:checked')?.value||"",
+      hsct_effects:document.querySelector('textarea[name="hsct_effects"]')?.value||"",
+      supplements:document.querySelector('input[name="supplements"]:checked')?.value||"",
+      supplement_type:values("supplement_type").join(", "),
+      supplements_other:document.querySelector('input[name="supplements_other"]')?.value||"",
+      vitamin_d_dose:document.querySelector('input[name="vitamin_d_dose"]:checked')?.value||"",
+      diet:document.querySelector('input[name="diet"]:checked')?.value||"",
+      diet_type:values("diet_type").join(", "),
+      diet_other:document.querySelector('input[name="diet_other"]')?.value||"",
+      exercise:document.querySelector('input[name="exercise"]:checked')?.value||"",
+      exercise_type:values("exercise_type").join(", "),
+      exercise_other:document.querySelector('input[name="exercise_other"]')?.value||"",
+      exercise_frequency:document.querySelector('input[name="exercise_frequency"]:checked')?.value||"",
+      exercise_duration:document.querySelector('input[name="exercise_duration"]:checked')?.value||"",
+      consent:document.getElementById("consent")?.checked ? "Да" : "Не"
     };
 
     try{
-      await fetch(SCRIPT_URL, {
-        method: "POST",
-        mode: "no-cors",
-        headers: {"Content-Type":"text/plain;charset=utf-8"},
-        body: JSON.stringify(payload)
-      });
+      await fetch(SCRIPT_URL,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(payload)});
       form.reset();
-      toggleDetails("smoking","smokingDetails");
-      toggleDetails("alcohol","alcoholDetails");
-      document.getElementById("alcoholWeakDetails").classList.add("hidden");
-      document.getElementById("alcoholStrongDetails").classList.add("hidden");
-      toggleDetails("diet","dietDetails");
-      toggleDetails("exercise","exerciseDetails");
-      toggleTherapyDetails();
-      toggleHsctDetails();
-      toggleSupplementDetails();
-      success.style.display = "block";
-      window.scrollTo({top:document.body.scrollHeight, behavior:"smooth"});
+      refreshConditionalSections();
+      document.querySelectorAll(".card").forEach(c=>{c.classList.remove("is-invalid","is-answered")});
+      success.style.display="block";
+      window.scrollTo({top:document.body.scrollHeight,behavior:"smooth"});
     }catch(err){
       console.error(err);
-      error.style.display = "block";
+      error.textContent="Възникна проблем при изпращането. Проверете интернет връзката и опитайте отново.";
+      error.style.display="block";
     }finally{
-      submitBtn.disabled = false;
-      submitBtn.textContent = "Изпрати анкетата";
+      submitBtn.disabled=false;
+      submitBtn.textContent="Изпрати анкетата";
     }
   });
+
+  refreshConditionalSections();
 </script>
 </body>
 </html>
