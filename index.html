@@ -69,6 +69,11 @@
       border-color:#e6a1a1;
       box-shadow:0 7px 22px rgba(190,50,50,.08);
     }
+    #q8.is-answered,#q8.is-unanswered,#q8.is-invalid{
+      background:var(--card);
+      border-color:#e7ebf0;
+      box-shadow:0 5px 18px rgba(16,45,84,.05);
+    }
     .validation-started .card{
       transition:background .2s ease,border-color .2s ease,box-shadow .2s ease;
     }
@@ -642,18 +647,12 @@
   const success = document.getElementById("success");
   const error = document.getElementById("error");
 
-  function toggleDetails(radioName, detailsId){
-    const selected = document.querySelector(`input[name="${radioName}"]:checked`);
-    const box = document.getElementById(detailsId);
-    if (box) box.classList.toggle("hidden", !selected || selected.value !== "Да");
-  }
-
   function values(name){
     return [...document.querySelectorAll(`input[name="${name}"]:checked`)].map(x => x.value);
   }
 
-  function groupChecked(name){
-    return document.querySelectorAll(`input[name="${name}"]:checked`).length > 0;
+  function hasValue(name){
+    return !!document.querySelector(`input[name="${name}"]:checked`);
   }
 
   function textFilled(name){
@@ -661,155 +660,191 @@
     return !!el && !!el.value.trim();
   }
 
-  function visibleSelectFilled(name){
+  function selectFilled(name){
     const el = document.querySelector(`select[name="${name}"]`);
-    return !!el && !el.closest(".hidden") && !!el.value;
+    return !!el && !!el.value;
   }
 
-  function stateCard(card, ok, optional=false){
+  function visible(el){
+    return !!el && !el.closest(".hidden");
+  }
+
+  function setCard(card, state, optional=false){
     if (!card) return;
-    card.classList.remove("is-invalid");
-    if (optional){
-      card.classList.remove("is-answered","is-unanswered");
-      return;
-    }
-    // Keep all cards white until the user tries to submit.
-    if (!form.classList.contains("validation-started")){
-      card.classList.remove("is-answered","is-unanswered");
-      return;
-    }
-    card.classList.toggle("is-answered", !!ok);
-    card.classList.toggle("is-unanswered", !ok);
+    card.classList.remove("is-invalid","is-answered","is-unanswered");
+    if (!form.classList.contains("validation-started")) return;
+    if (optional) return;
+    card.classList.add(state ? "is-answered" : "is-unanswered");
   }
 
-  function computeStates(){
+  function getStates(){
     const q = id => document.getElementById(id);
     const states = [];
 
-    states.push({card:q("q1"), ok:groupChecked("years_ms")});
-    states.push({card:q("q2"), ok:groupChecked("age")});
+    states.push({id:"q1", ok:hasValue("years_ms")});
+    states.push({id:"q2", ok:hasValue("age")});
 
-    const smoking = document.querySelector('input[name="smoking"]:checked')?.value;
+    // Q3: smoking — exactly one main answer. Conditional subquestion depends on it.
+    const smoking = document.querySelector('input[name="smoking"]:checked')?.value || "";
     let smokingOk = !!smoking;
-    if (smoking === "Да") smokingOk = groupChecked("smoking_since");
-    if (smoking === "Отказах ги") smokingOk = groupChecked("smoking_quit_since");
-    states.push({card:q("q3"), ok:smokingOk});
+    if (smoking === "Да") smokingOk = hasValue("smoking_since");
+    if (smoking === "Отказах ги") smokingOk = hasValue("smoking_quit_since");
+    states.push({id:"q3", ok:smokingOk});
 
-    const alcohol = document.querySelector('input[name="alcohol"]:checked')?.value;
+    // Q4: alcohol — main answer + frequency + type + only the relevant quantity field(s).
+    const alcohol = document.querySelector('input[name="alcohol"]:checked')?.value || "";
     let alcoholOk = !!alcohol;
     if (alcohol === "Да"){
-      const freqOk = groupChecked("alcohol_frequency");
-      const typeOk = groupChecked("alcohol_type");
-      const weak = document.querySelector('input[name="alcohol_type"][value="Слабоалкохолни"]')?.checked;
-      const strong = document.querySelector('input[name="alcohol_type"][value="Силноалкохолни"]')?.checked;
-      alcoholOk = freqOk && typeOk &&
-        (!weak || groupChecked("alcohol_weak_amount")) &&
-        (!strong || groupChecked("alcohol_strong_amount"));
+      const frequencyOk = hasValue("alcohol_frequency");
+      const typeSelected = values("alcohol_type");
+      const typeOk = typeSelected.length > 0;
+      const weak = typeSelected.includes("Слабоалкохолни");
+      const strong = typeSelected.includes("Силноалкохолни");
+      const weakOk = !weak || hasValue("alcohol_weak_amount");
+      const strongOk = !strong || hasValue("alcohol_strong_amount");
+      alcoholOk = frequencyOk && typeOk && weakOk && strongOk;
     }
-    states.push({card:q("q4"), ok:alcoholOk});
+    states.push({id:"q4", ok:alcoholOk});
 
-    states.push({card:q("q5"), ok:groupChecked("edss_diagnosis")});
-    states.push({card:q("q6"), ok:groupChecked("edss_current")});
+    states.push({id:"q5", ok:hasValue("edss_diagnosis")});
+    states.push({id:"q6", ok:hasValue("edss_current")});
 
-    const symptoms = groupChecked("symptoms");
-    const otherSymptom = document.querySelector('input[name="symptoms"][value="Друго"]')?.checked;
-    states.push({card:q("q7"), ok:symptoms && (!otherSymptom || textFilled("symptoms_other"))});
+    // Q7 symptoms: at least one; "Друго" requires text.
+    const symptoms = values("symptoms");
+    const symptomsOk = symptoms.length > 0 &&
+      (!symptoms.includes("Друго") || textFilled("symptoms_other"));
+    states.push({id:"q7", ok:symptomsOk});
 
-    // Q8 is the only optional question.
-    states.push({card:q("q8"), ok:true, optional:true});
+    // Q8 intentionally optional.
+    states.push({id:"q8", ok:true, optional:true});
 
-    states.push({card:q("q9"), ok:groupChecked("relapse_12m")});
-    states.push({card:q("q10"), ok:groupChecked("mri_12m")});
-    states.push({card:q("q11"), ok:groupChecked("walking_aid")});
-    states.push({card:q("q12"), ok:groupChecked("daily_impact")});
+    states.push({id:"q9", ok:hasValue("relapse_12m")});
+    states.push({id:"q10", ok:hasValue("mri_12m")});
+    states.push({id:"q11", ok:hasValue("walking_aid")});
+    states.push({id:"q12", ok:hasValue("daily_impact")});
 
-    const therapy = document.querySelector('input[name="therapy_status"]:checked')?.value;
+    // Q13 therapy.
+    const therapy = document.querySelector('input[name="therapy_status"]:checked')?.value || "";
     let therapyOk = !!therapy;
     if (therapy === "Да – първа линия"){
-      const has = groupChecked("therapy_first");
-      const other = document.querySelector('input[name="therapy_first"][value="Друго"]')?.checked;
-      therapyOk = has && (!other || textFilled("therapy_first_other"));
+      const a = values("therapy_first");
+      therapyOk = a.length > 0 && (!a.includes("Друго") || textFilled("therapy_first_other"));
     } else if (therapy === "Да – втора линия"){
-      const has = groupChecked("therapy_second");
-      const other = document.querySelector('input[name="therapy_second"][value="Друго"]')?.checked;
-      therapyOk = has && (!other || textFilled("therapy_second_other"));
+      const a = values("therapy_second");
+      therapyOk = a.length > 0 && (!a.includes("Друго") || textFilled("therapy_second_other"));
     } else if (therapy === "Да – друга / не знам към коя линия спада"){
       therapyOk = textFilled("therapy_other");
     }
-    states.push({card:q("q13"), ok:therapyOk});
+    states.push({id:"q13", ok:therapyOk});
 
-    const hsct = document.querySelector('input[name="hsct"]:checked')?.value;
+    // Q14 HSCT.
+    const hsct = document.querySelector('input[name="hsct"]:checked')?.value || "";
     let hsctOk = !!hsct;
     if (hsct === "Да"){
-      hsctOk = visibleSelectFilled("hsct_time") &&
+      hsctOk = selectFilled("hsct_time") &&
         textFilled("hsct_edss_before") &&
-        groupChecked("hsct_edss_change") &&
+        hasValue("hsct_edss_change") &&
         textFilled("hsct_effects");
     }
-    states.push({card:q("q14"), ok:hsctOk});
+    states.push({id:"q14", ok:hsctOk});
 
-    const supplements = document.querySelector('input[name="supplements"]:checked')?.value;
-    let suppOk = !!supplements;
-    if (supplements === "Да"){
-      const hasType = groupChecked("supplement_type");
-      const vitaminD = document.querySelector('input[name="supplement_type"][value="Витамин D"]')?.checked;
-      const other = document.querySelector('input[name="supplement_type"][value="Други"]')?.checked;
-      suppOk = hasType &&
-        (!vitaminD || groupChecked("vitamin_d_dose")) &&
+    // Q15 supplements.
+    const supp = document.querySelector('input[name="supplements"]:checked')?.value || "";
+    let suppOk = !!supp;
+    if (supp === "Да"){
+      const a = values("supplement_type");
+      const vitaminD = a.includes("Витамин D");
+      const other = a.includes("Други");
+      suppOk = a.length > 0 &&
+        (!vitaminD || hasValue("vitamin_d_dose")) &&
         (!other || textFilled("supplements_other"));
     }
-    states.push({card:q("q15"), ok:suppOk});
+    states.push({id:"q15", ok:suppOk});
 
-    const diet = document.querySelector('input[name="diet"]:checked')?.value;
+    // Q16 diet.
+    const diet = document.querySelector('input[name="diet"]:checked')?.value || "";
     let dietOk = !!diet;
     if (diet === "Да"){
-      const has = groupChecked("diet_type");
-      const other = document.querySelector('input[name="diet_type"][value="Друга"]')?.checked;
-      dietOk = has && (!other || textFilled("diet_other"));
+      const a = values("diet_type");
+      dietOk = a.length > 0 && (!a.includes("Друга") || textFilled("diet_other"));
     }
-    states.push({card:q("q16"), ok:dietOk});
+    states.push({id:"q16", ok:dietOk});
 
-    const exercise = document.querySelector('input[name="exercise"]:checked')?.value;
+    // Q17 exercise.
+    const exercise = document.querySelector('input[name="exercise"]:checked')?.value || "";
     let exerciseOk = !!exercise;
     if (exercise === "Да"){
-      const hasType = groupChecked("exercise_type");
-      const other = document.querySelector('input[name="exercise_type"][value="Друго"]')?.checked;
-      exerciseOk = hasType &&
+      const a = values("exercise_type");
+      const other = a.includes("Друго");
+      exerciseOk = a.length > 0 &&
         (!other || textFilled("exercise_other")) &&
-        groupChecked("exercise_frequency") &&
-        groupChecked("exercise_duration");
+        hasValue("exercise_frequency") &&
+        hasValue("exercise_duration");
     }
-    states.push({card:q("q17"), ok:exerciseOk});
+    states.push({id:"q17", ok:exerciseOk});
 
+    // Consent card (q18).
     const consent = document.getElementById("consent");
-    states.push({card:consent?.closest(".card"), ok:!!consent?.checked});
+    states.push({id:"q18", ok:!!consent?.checked});
 
     return states;
   }
 
   function updateQuestionColors(){
-    computeStates().forEach(s => stateCard(s.card, s.ok, !!s.optional));
+    getStates().forEach(s => setCard(document.getElementById(s.id), s.ok, !!s.optional));
   }
 
   function validateSurvey(){
     form.classList.add("validation-started");
-    const states = computeStates();
+    const states = getStates();
     states.forEach(s => {
-      if (s.optional) stateCard(s.card, true, true);
-      else stateCard(s.card, s.ok, false);
+      setCard(document.getElementById(s.id), s.ok, !!s.optional);
     });
 
-    const invalid = states.find(s => !s.optional && !s.ok);
-    if (invalid){
-      invalid.card.classList.add("is-invalid");
-      invalid.card.scrollIntoView({behavior:"smooth", block:"center"});
-      const focusable = invalid.card.querySelector('input:not([type="hidden"]), select, textarea');
-      if (focusable){
-        setTimeout(() => focusable.focus({preventScroll:true}), 250);
-      }
+    const firstInvalid = states.find(s => !s.optional && !s.ok);
+    if (firstInvalid){
+      const card = document.getElementById(firstInvalid.id);
+      card.classList.remove("is-answered");
+      card.classList.add("is-unanswered","is-invalid");
+      card.scrollIntoView({behavior:"smooth", block:"center"});
+      const focusable = card.querySelector('input:not([type="hidden"]), select, textarea');
+      if (focusable) setTimeout(() => focusable.focus({preventScroll:true}), 250);
       return false;
     }
     return true;
+  }
+
+  function toggleSmoking(){
+    const selected = document.querySelector('input[name="smoking"]:checked')?.value || "";
+    document.getElementById("smokingDetails").classList.toggle("hidden", selected !== "Да");
+    document.getElementById("smokingQuitDetails").classList.toggle("hidden", selected !== "Отказах ги");
+    if (selected !== "Да") document.querySelectorAll('input[name="smoking_since"]').forEach(x=>x.checked=false);
+    if (selected !== "Отказах ги") document.querySelectorAll('input[name="smoking_quit_since"]').forEach(x=>x.checked=false);
+  }
+
+  function toggleAlcohol(){
+    const selected = document.querySelector('input[name="alcohol"]:checked')?.value || "";
+    document.getElementById("alcoholDetails").classList.toggle("hidden", selected !== "Да");
+    if (selected === "Не"){
+      document.querySelectorAll('input[name="alcohol_frequency"],input[name="alcohol_type"],input[name="alcohol_weak_amount"],input[name="alcohol_strong_amount"]').forEach(x=>x.checked=false);
+      document.getElementById("alcoholWeakDetails").classList.add("hidden");
+      document.getElementById("alcoholStrongDetails").classList.add("hidden");
+    }
+  }
+
+  function toggleAlcoholType(){
+    const weak = document.querySelector('input[name="alcohol_type"][value="Слабоалкохолни"]')?.checked;
+    const strong = document.querySelector('input[name="alcohol_type"][value="Силноалкохолни"]')?.checked;
+    document.getElementById("alcoholWeakDetails").classList.toggle("hidden", !weak);
+    document.getElementById("alcoholStrongDetails").classList.toggle("hidden", !strong);
+    if (!weak) document.querySelectorAll('input[name="alcohol_weak_amount"]').forEach(x=>x.checked=false);
+    if (!strong) document.querySelectorAll('input[name="alcohol_strong_amount"]').forEach(x=>x.checked=false);
+  }
+
+  function toggleDetails(radioName, detailsId){
+    const selected = document.querySelector(`input[name="${radioName}"]:checked`);
+    const box = document.getElementById(detailsId);
+    if (box) box.classList.toggle("hidden", !selected || selected.value !== "Да");
   }
 
   function toggleTherapyDetails(){
@@ -833,80 +868,42 @@
     if (vd) vd.classList.toggle("hidden", !vitaminD);
   }
 
-  document.querySelectorAll('input[name="smoking"]').forEach(el=>el.addEventListener("change",()=>{
-    const details=document.getElementById("smokingDetails");
-    const quitDetails=document.getElementById("smokingQuitDetails");
-    details.classList.toggle("hidden",el.value!=="Да");
-    quitDetails.classList.toggle("hidden",el.value!=="Отказах ги");
+  // Conditional UI.
+  document.querySelectorAll('input[name="smoking"]').forEach(el=>el.addEventListener("change",()=>{toggleSmoking(); if(form.classList.contains("validation-started")) updateQuestionColors();}));
+  document.querySelectorAll('input[name="alcohol"]').forEach(el=>el.addEventListener("change",()=>{toggleAlcohol(); if(form.classList.contains("validation-started")) updateQuestionColors();}));
+  document.querySelectorAll('input[name="alcohol_type"]').forEach(el=>el.addEventListener("change",()=>{toggleAlcoholType(); if(form.classList.contains("validation-started")) updateQuestionColors();}));
+  document.querySelectorAll('input[name="diet"]').forEach(el=>el.addEventListener("change",()=>{toggleDetails("diet","dietDetails"); if(form.classList.contains("validation-started")) updateQuestionColors();}));
+  document.querySelectorAll('input[name="exercise"]').forEach(el=>el.addEventListener("change",()=>{toggleDetails("exercise","exerciseDetails"); if(form.classList.contains("validation-started")) updateQuestionColors();}));
+  document.querySelectorAll('input[name="therapy_status"]').forEach(el=>el.addEventListener("change",()=>{toggleTherapyDetails(); if(form.classList.contains("validation-started")) updateQuestionColors();}));
+  document.querySelectorAll('input[name="hsct"]').forEach(el=>el.addEventListener("change",()=>{toggleHsctDetails(); if(form.classList.contains("validation-started")) updateQuestionColors();}));
+  document.querySelectorAll('input[name="supplements"]').forEach(el=>el.addEventListener("change",()=>{toggleSupplementDetails(); if(form.classList.contains("validation-started")) updateQuestionColors();}));
+  document.querySelectorAll('input[name="supplement_type"]').forEach(el=>el.addEventListener("change",()=>{toggleSupplementDetails(); if(form.classList.contains("validation-started")) updateQuestionColors();}));
 
-    if(el.value!=="Да") {
-      document.querySelectorAll('input[name="smoking_since"]').forEach(x=>x.checked=false);
-    }
-    if(el.value!=="Отказах ги") {
-      document.querySelectorAll('input[name="smoking_quit_since"]').forEach(x=>x.checked=false);
-    }
-  }));
+  // Once validation has started, every interaction re-evaluates all cards.
+  form.addEventListener("change",()=>{ if(form.classList.contains("validation-started")) updateQuestionColors(); });
+  form.addEventListener("input",()=>{ if(form.classList.contains("validation-started")) updateQuestionColors(); });
 
-  document.querySelectorAll('input[name="alcohol"]').forEach(el => el.addEventListener("change", () => {
-    toggleDetails("alcohol","alcoholDetails");
-    if (el.value === "Не"){
-      document.querySelectorAll('input[name="alcohol_frequency"],input[name="alcohol_type"],input[name="alcohol_weak_amount"],input[name="alcohol_strong_amount"]').forEach(x=>x.checked=false);
-      document.getElementById("alcoholWeakDetails").classList.add("hidden");
-      document.getElementById("alcoholStrongDetails").classList.add("hidden");
-    }
-  }));
-
-  document.querySelectorAll('input[name="alcohol_type"]').forEach(el => el.addEventListener("change", () => {
-    const weak = document.querySelector('input[name="alcohol_type"][value="Слабоалкохолни"]')?.checked;
-    const strong = document.querySelector('input[name="alcohol_type"][value="Силноалкохолни"]')?.checked;
-    document.getElementById("alcoholWeakDetails").classList.toggle("hidden", !weak);
-    document.getElementById("alcoholStrongDetails").classList.toggle("hidden", !strong);
-    if (!weak) document.querySelectorAll('input[name="alcohol_weak_amount"]').forEach(x=>x.checked=false);
-    if (!strong) document.querySelectorAll('input[name="alcohol_strong_amount"]').forEach(x=>x.checked=false);
-  }));
-
-  document.querySelectorAll('input[name="diet"]').forEach(el => el.addEventListener("change", () => {
-    toggleDetails("diet","dietDetails"); updateQuestionColors();
-  }));
-  document.querySelectorAll('input[name="exercise"]').forEach(el => el.addEventListener("change", () => {
-    toggleDetails("exercise","exerciseDetails"); updateQuestionColors();
-  }));
-  document.querySelectorAll('input[name="therapy_status"]').forEach(el => el.addEventListener("change", () => {
-    toggleTherapyDetails(); updateQuestionColors();
-  }));
-  document.querySelectorAll('input[name="hsct"]').forEach(el => el.addEventListener("change", () => {
-    toggleHsctDetails(); updateQuestionColors();
-  }));
-  document.querySelectorAll('input[name="supplements"]').forEach(el => el.addEventListener("change", () => {
-    toggleSupplementDetails(); updateQuestionColors();
-  }));
-  document.querySelectorAll('input[name="supplement_type"]').forEach(el => el.addEventListener("change", () => {
-    toggleSupplementDetails(); updateQuestionColors();
-  }));
-
-  // Any change/input refreshes colors immediately.
-
-  form.addEventListener("submit", async (e) => {
+  form.addEventListener("submit",async(e)=>{
     e.preventDefault();
-    success.style.display = "none";
-    error.style.display = "none";
+    success.style.display="none";
+    error.style.display="none";
 
-    if (!validateSurvey()){
-      error.textContent = "Моля, попълнете всички задължителни въпроси. Преместих Ви към първия непопълнен въпрос.";
-      error.style.display = "block";
+    if(!validateSurvey()){
+      error.textContent="Моля, попълнете всички задължителни въпроси. Преместих Ви към първия непопълнен въпрос.";
+      error.style.display="block";
       return;
     }
 
-    if (SCRIPT_URL.includes("PASTE_GOOGLE")){
-      error.textContent = "Анкетата още не е свързана с Google Sheets. Организаторът трябва да постави URL адреса на Google Apps Script.";
-      error.style.display = "block";
+    if(SCRIPT_URL.includes("PASTE_GOOGLE")){
+      error.textContent="Анкетата още не е свързана с Google Sheets. Организаторът трябва да постави URL адреса на Google Apps Script.";
+      error.style.display="block";
       return;
     }
 
-    submitBtn.disabled = true;
-    submitBtn.textContent = "Изпращане…";
+    submitBtn.disabled=true;
+    submitBtn.textContent="Изпращане…";
 
-    const payload = {
+    const payload={
       timestamp:new Date().toISOString(),
       years_ms:document.querySelector('input[name="years_ms"]:checked')?.value||"",
       age:document.querySelector('input[name="age"]:checked')?.value||"",
@@ -957,8 +954,8 @@
       await fetch(SCRIPT_URL,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(payload)});
       form.reset();
       form.classList.remove("validation-started");
-      toggleDetails("smoking","smokingDetails");
-      toggleDetails("alcohol","alcoholDetails");
+      toggleSmoking();
+      toggleAlcohol();
       document.getElementById("alcoholWeakDetails").classList.add("hidden");
       document.getElementById("alcoholStrongDetails").classList.add("hidden");
       toggleDetails("diet","dietDetails");
@@ -966,7 +963,7 @@
       toggleTherapyDetails();
       toggleHsctDetails();
       toggleSupplementDetails();
-      document.querySelectorAll(".card").forEach(c => c.classList.remove("is-invalid","is-answered","is-unanswered"));
+      document.querySelectorAll(".card").forEach(c=>c.classList.remove("is-invalid","is-answered","is-unanswered"));
       success.textContent="Благодарим Ви! Отговорите са изпратени успешно.";
       success.style.display="block";
       window.scrollTo({top:document.body.scrollHeight,behavior:"smooth"});
@@ -980,9 +977,9 @@
     }
   });
 
-  // Initial state: all mandatory questions red, Q8 neutral.
-  toggleDetails("smoking","smokingDetails");
-  toggleDetails("alcohol","alcoholDetails");
+  // Initial UI only: no validation colors before submit.
+  toggleSmoking();
+  toggleAlcohol();
   toggleDetails("diet","dietDetails");
   toggleDetails("exercise","exerciseDetails");
   toggleTherapyDetails();
