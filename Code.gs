@@ -106,7 +106,7 @@ function doPost(e) {
   "Как повлия HSCT като цяло": "hsct_effects",
   "Хранителни добавки": "supplements",
   "Видове хранителни добавки": "supplement_type",
-  "Добавки – друго": "supplements_other",
+  "Добавки – друго": "supplement_other",
   "Витамин D – дневна доза": "vitamin_d_dose",
   "Диета/хранителен режим": "diet",
   "Вид диета": "diet_type",

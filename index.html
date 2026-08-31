@@ -798,8 +798,21 @@
     if (box) box.classList.toggle("hidden", v !== "Да");
 
     const vd = !!document.querySelector('input[name="supplement_type"][value="Витамин D"]')?.checked;
+    const other = !!document.querySelector('input[name="supplement_type"][value="Други"]')?.checked;
+
     const vdBox = document.getElementById("vitaminDDetails");
     if (vdBox) vdBox.classList.toggle("hidden", !vd);
+
+    const otherInput = document.querySelector('[name="supplement_other"]');
+    if (otherInput) {
+      otherInput.required = (v === "Да" && other);
+      otherInput.disabled = (v !== "Да" || !other);
+      if (!other) otherInput.value = "";
+    }
+
+    if (!vd) {
+      document.querySelectorAll('input[name="vitamin_d_dose"]').forEach(x => x.checked = false);
+    }
   }
 
   function refreshUI(){
@@ -956,10 +969,10 @@
         const vd=a.includes("Витамин D");
         const other=a.includes("Други");
         const vdOk=!vd||!!checked("vitamin_d_dose");
-        const otherOk=!other||filled("supplements_other");
+        const otherOk=!other||filled("supplement_other");
         fields.push(["supplement_type",typeOk]);
         if(vd) fields.push(["vitamin_d_dose",vdOk]);
-        if(other) fields.push(["supplements_other",otherOk]);
+        if(other) fields.push(["supplement_other",otherOk]);
         ok=typeOk&&vdOk&&otherOk;
       }
       states.push({id:"q15",ok,fields});
@@ -1253,7 +1266,7 @@
       hsct_effects:document.querySelector('[name="hsct_effects"]')?.value||"",
       supplements:checked("supplements")?.value||"",
       supplement_type:checkedValues("supplement_type").join(", "),
-      supplements_other:document.querySelector('[name="supplements_other"]')?.value||"",
+      supplement_other:document.querySelector('[name="supplement_other"]')?.value||"",
       vitamin_d_dose:checked("vitamin_d_dose")?.value||"",
       diet:checked("diet")?.value||"",
       diet_type:checkedValues("diet_type").join(", "),
